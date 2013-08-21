@@ -116,16 +116,14 @@ static uint8_t get_vlc_token_ac(struct entropy_ctx *c,
 /* Decode sign of value from VLC. See Figure F.12 in spec. */
 static int16_t extend_sign(int16_t v, int sz)
 {
-    int vt = 1 << (sz - 1);
+  int vt = 1 << (sz - 1);
 
-    if (v >= vt)
-        return v;
+  if (v >= vt) { return v; }
 
-    int range = (1 << sz) - 1;
+  int range = (1 << sz) - 1;
+  v = -(range - v);
 
-    v = -(range - v);
-
-    return v;
+  return v;
 }
 
 static void read_block(struct c63_common *cm, int16_t *out_data,
