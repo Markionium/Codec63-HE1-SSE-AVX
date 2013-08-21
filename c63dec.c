@@ -126,90 +126,90 @@ static int16_t extend_sign(int16_t v, int sz)
   return v;
 }
 
-static void read_block(struct c63_common *cm, int16_t *out_data,
-        uint32_t width, uint32_t height, uint32_t uoffset, uint32_t voffset,
-        int16_t *prev_DC, int32_t cc, int channel)
+static void read_block(struct c63_common *cm, int16_t *out_data, uint32_t width,
+    uint32_t height, uint32_t uoffset, uint32_t voffset, int16_t *prev_DC,
+    int32_t cc, int channel)
 {
-    uint8_t size;
-    int i, num_zero=0;
+  int i, num_zero=0;
+  uint8_t size;
 
-    /* Read motion vector */
-    struct macroblock *mb = &cm->curframe->mbs[channel][voffset/8 * cm->padw[channel]/8 + uoffset/8];
+  /* Read motion vector */
+  struct macroblock *mb =
+    &cm->curframe->mbs[channel][voffset/8 * cm->padw[channel]/8 + uoffset/8];
 
-    /* Use inter pred? */
-    mb->use_mv = get_bits(&cm->e_ctx, 1);
+  /* Use inter pred? */
+  mb->use_mv = get_bits(&cm->e_ctx, 1);
 
-    if (mb->use_mv)
+  if (mb->use_mv)
+  {
+    int reuse_prev_mv = get_bits(&cm->e_ctx, 1);
+    if (reuse_prev_mv)
     {
-        int reuse_prev_mv = get_bits(&cm->e_ctx, 1);
-        if (reuse_prev_mv)
-        {
-            mb->mv_x = (mb-1)->mv_x;
-            mb->mv_y = (mb-1)->mv_y;
-        }
-        else
-        {
-            int16_t val;
-            size = get_vlc_token(&cm->e_ctx, MVVLC, MVVLC_Size, ARRAY_SIZE(MVVLC));
-            val = get_bits(&cm->e_ctx, size);
-            mb->mv_x = extend_sign(val, size);
-
-            size = get_vlc_token(&cm->e_ctx, MVVLC, MVVLC_Size, ARRAY_SIZE(MVVLC));
-            val = get_bits(&cm->e_ctx, size);
-            mb->mv_y = extend_sign(val, size);
-        }
+      mb->mv_x = (mb-1)->mv_x;
+      mb->mv_y = (mb-1)->mv_y;
     }
-
-    /* Read residuals */
-
-    // Linear block in memory
-    int16_t *block = &out_data[uoffset * 8 + voffset * width];
-    memset(block, 0, 64 * sizeof(int16_t));
-
-    /* Decode DC */
-    size = get_vlc_token(&cm->e_ctx, DCVLC[cc], DCVLC_Size[cc], ARRAY_SIZE(DCVLC[cc]));
-    int16_t dc = get_bits(&cm->e_ctx, size);
-
-    dc = extend_sign(dc, size);
-
-    block[0] = dc + *prev_DC;
-    *prev_DC = block[0];
-
-    /* Decode AC RLE */
-    for (i=1; i<64; ++i)
+    else
     {
-        uint16_t token = get_vlc_token_ac(&cm->e_ctx, ACVLC[cc], ACVLC_Size[cc]);
+      int16_t val;
+      size = get_vlc_token(&cm->e_ctx, MVVLC, MVVLC_Size, ARRAY_SIZE(MVVLC));
+      val = get_bits(&cm->e_ctx, size);
+      mb->mv_x = extend_sign(val, size);
 
-        num_zero = token / 11;
-        size = token % 11;
-
-        i += num_zero;
-
-        if (num_zero == 15 && size == 0)
-        {
-            continue;
-        }
-
-        if (num_zero == 0 && size == 0)
-            break;
-
-        int16_t ac = get_bits(&cm->e_ctx, size);
-
-        block[i] = extend_sign(ac, size);
+      size = get_vlc_token(&cm->e_ctx, MVVLC, MVVLC_Size, ARRAY_SIZE(MVVLC));
+      val = get_bits(&cm->e_ctx, size);
+      mb->mv_y = extend_sign(val, size);
     }
+  }
 
+  /* Read residuals */
+
+  // Linear block in memory
+  int16_t *block = &out_data[uoffset * 8 + voffset * width];
+  memset(block, 0, 64 * sizeof(int16_t));
+
+  /* Decode DC */
+  size =
+    get_vlc_token(&cm->e_ctx, DCVLC[cc], DCVLC_Size[cc], ARRAY_SIZE(DCVLC[cc]));
+
+  int16_t dc = get_bits(&cm->e_ctx, size);
+
+  dc = extend_sign(dc, size);
+
+  block[0] = dc + *prev_DC;
+  *prev_DC = block[0];
+
+  /* Decode AC RLE */
+  for (i = 1; i < 64; ++i)
+  {
+    uint16_t token = get_vlc_token_ac(&cm->e_ctx, ACVLC[cc], ACVLC_Size[cc]);
+
+    num_zero = token / 11;
+    size = token % 11;
+
+    i += num_zero;
+
+    if (num_zero == 15 && size == 0) { continue; }
+    else if (num_zero == 0 && size == 0) { break; }
+
+    int16_t ac = get_bits(&cm->e_ctx, size);
+
+    block[i] = extend_sign(ac, size);
+  }
 #if 0
-    int j;
-    static int blocknum;
-    ++blocknum;
-    printf("Dump block %d:\n", blocknum);
+  int j;
+  static int blocknum;
+  ++blocknum;
+  printf("Dump block %d:\n", blocknum);
 
-    for(i=0; i<8; ++i) {
-        for (j=0; j<8; ++j)
-            printf(", %5d", block[i*8+j]);
-        printf("\n");
+  for(i = 0; i < 8; ++i)
+  {
+    for (j = 0; j < 8; ++j)
+    {
+      printf(", %5d", block[i*8+j]);
     }
-    printf("Finished block\n\n");
+    printf("\n");
+  }
+  printf("Finished block\n\n");
 #endif
 }
 
