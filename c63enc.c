@@ -123,37 +123,37 @@ static void c63_encode_image(struct c63_common *cm, yuv_t *image)
 
 struct c63_common* init_c63_enc(int width, int height)
 {
-    int i;
-    struct c63_common *cm = calloc(1, sizeof(struct c63_common));
+  int i;
+  /* calloc() sets allocated memory to zero */
+  struct c63_common *cm = calloc(1, sizeof(struct c63_common));
 
-    cm->width = width;
-    cm->height = height;
-    cm->padw[0] = cm->ypw = (uint32_t)(ceil(width/16.0f)*16);
-    cm->padh[0] = cm->yph = (uint32_t)(ceil(height/16.0f)*16);
-    cm->padw[1] = cm->upw = (uint32_t)(ceil(width*UX/(YX*8.0f))*8);
-    cm->padh[1] = cm->uph = (uint32_t)(ceil(height*UY/(YY*8.0f))*8);
-    cm->padw[2] = cm->vpw = (uint32_t)(ceil(width*VX/(YX*8.0f))*8);
-    cm->padh[2] = cm->vph = (uint32_t)(ceil(height*VY/(YY*8.0f))*8);
+  cm->width = width;
+  cm->height = height;
 
-    cm->mb_cols = cm->ypw / 8;
-    cm->mb_rows = cm->yph / 8;
+  cm->padw[0] = cm->ypw = (uint32_t)(ceil(width/16.0f)*16);
+  cm->padh[0] = cm->yph = (uint32_t)(ceil(height/16.0f)*16);
+  cm->padw[1] = cm->upw = (uint32_t)(ceil(width*UX/(YX*8.0f))*8);
+  cm->padh[1] = cm->uph = (uint32_t)(ceil(height*UY/(YY*8.0f))*8);
+  cm->padw[2] = cm->vpw = (uint32_t)(ceil(width*VX/(YX*8.0f))*8);
+  cm->padh[2] = cm->vph = (uint32_t)(ceil(height*VY/(YY*8.0f))*8);
 
+  cm->mb_cols = cm->ypw / 8;
+  cm->mb_rows = cm->yph / 8;
 
-    /* Quality parameters */
-    cm->qp = 25;                 // Constant quantization factor. Range: [1..50]
-    cm->me_search_range = 16;    // Pixels in every direction
-    cm->keyframe_interval = 100;  // Distance between keyframes
+  /* Quality parameters */
+  cm->qp = 25;                  // Constant quantization factor. Range: [1..50]
+  cm->me_search_range = 16;     // Pixels in every direction
+  cm->keyframe_interval = 100;  // Distance between keyframes
 
+  /* Initialize quantization tables */
+  for (i = 0; i < 64; ++i)
+  {
+    cm->quanttbl[0][i] = yquanttbl_def[i] / (cm->qp / 10.0);
+    cm->quanttbl[1][i] = uvquanttbl_def[i] / (cm->qp / 10.0);
+    cm->quanttbl[2][i] = uvquanttbl_def[i] / (cm->qp / 10.0);
+  }
 
-    /* Initialize quantization tables */
-    for (i=0; i<64; ++i)
-    {
-        cm->quanttbl[0][i] = yquanttbl_def[i] / (cm->qp / 10.0);
-        cm->quanttbl[1][i] = uvquanttbl_def[i] / (cm->qp / 10.0);
-        cm->quanttbl[2][i] = uvquanttbl_def[i] / (cm->qp / 10.0);
-    }
-
-    return cm;
+  return cm;
 }
 
 static void print_help()
