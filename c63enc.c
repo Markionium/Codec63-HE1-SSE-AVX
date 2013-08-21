@@ -225,7 +225,7 @@ int main(int argc, char **argv)
 
   input_file = argv[optind];
 
-  if (limit_numframes) { printf("Limited to %d frames.\n", limit_numframes); }
+  if (limit_numframes) { printf("Limited to %d frames.\n", limit_numframes); }
 
   FILE *infile = fopen(input_file, "rb");
 
