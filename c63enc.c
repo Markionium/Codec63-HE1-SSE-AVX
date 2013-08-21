@@ -158,15 +158,15 @@ struct c63_common* init_c63_enc(int width, int height)
 
 static void print_help()
 {
-    fprintf(stderr, "Usage: ./c63enc [options] input_file\n");
-    fprintf(stderr, "Commandline options:\n");
-    fprintf(stderr, "  -h                             height of images to compress\n");
-    fprintf(stderr, "  -w                             width of images to compress\n");
-    fprintf(stderr, "  -o                             Output file (.mjpg)\n");
-    fprintf(stderr, "  [-f]                           Limit number of frames to encode\n");
-    fprintf(stderr, "\n");
+  fprintf(stderr, "Usage: ./c63enc [options] input_file\n");
+  fprintf(stderr, "Commandline options:\n");
+  fprintf(stderr, "  -h                    height of images to compress\n");
+  fprintf(stderr, "  -w                    width of images to compress\n");
+  fprintf(stderr, "  -o                    Output file (.mjpg)\n");
+  fprintf(stderr, "  [-f]                  Limit number of frames to encode\n");
+  fprintf(stderr, "\n");
 
-    exit(EXIT_FAILURE);
+  exit(EXIT_FAILURE);
 }
 
 int main(int argc, char **argv)
