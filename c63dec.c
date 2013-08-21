@@ -18,42 +18,43 @@
 #define MARKER_EOI 0xd9
 #define MARKER_DHT 0xc4
 
-
 #define HUFF_AC_ZERO 16
 #define HUFF_AC_SIZE 11
 
 /* Decode VLC token */
-static uint8_t get_vlc_token(struct entropy_ctx *c, uint16_t *table, uint8_t *table_sz, int tablelen)
+static uint8_t get_vlc_token(struct entropy_ctx *c, uint16_t *table,
+    uint8_t *table_sz, int tablelen)
 {
-    uint16_t bits = 0;
+  int i, n;
+  uint16_t bits = 0;
 
-    int i, n;
-    for (n=1; n <= 16; ++n)
+  for (n = 1; n <= 16; ++n)
+  {
+    bits <<= 1;
+    bits |= get_bits(c, 1);
+
+    /* See if this string matches a token in VLC table */
+    for (i = 0; i < tablelen; ++i)
     {
-        bits <<= 1;
-        bits |= get_bits(c, 1);
+      if (table_sz[i] < n)
+      {
+        /* Too small token. */
+        continue;
+      }
 
-        /* See if this string matches a token in VLC table */
-        for (i=0; i<tablelen; ++i)
+      if (table_sz[i] == n)
+      {
+        if (bits == (table[i] & ((1 << n) - 1)))
         {
-            if (table_sz[i] < n)
-            {
-                /* Too small token. */
-                continue;
-            }
-            if (table_sz[i] == n)
-            {
-                if (bits == (table[i] & ((1 << n) - 1)))
-                {
-                    /* Found it */
-                    return i;
-                }
-            }
+          /* Found it */
+          return i;
         }
+      }
     }
+  }
 
-    fprintf(stdout, "VLC token not found.\n");
-    exit(1);
+  fprintf(stdout, "VLC token not found.\n");
+  exit(EXIT_FAILURE);
 }
 
 /* Decode AC VLC token.
