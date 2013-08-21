@@ -171,113 +171,107 @@ static void print_help()
 
 int main(int argc, char **argv)
 {
-    int c;
-    yuv_t *image;
+  int c;
+  yuv_t *image;
 
-    if(argc == 1)
+  if (argc == 1) { print_help(); }
+
+  while ((c = getopt(argc, argv, "h:w:o:f:i:")) != -1)
+  {
+    switch (c)
     {
+      case 'h':
+        height = atoi(optarg);
+        break;
+      case 'w':
+        width = atoi(optarg);
+        break;
+      case 'o':
+        output_file = optarg;
+        break;
+      case 'f':
+        limit_numframes = atoi(optarg);
+        break;
+      default:
         print_help();
+        break;
     }
+  }
 
-    while((c = getopt(argc, argv, "h:w:o:f:i:")) != -1)
-    {
-        switch(c)
-        {
-        case 'h':
-            height = atoi(optarg);
-            break;
-        case 'w':
-            width = atoi(optarg);
-            break;
-        case 'o':
-            output_file = optarg;
-            break;
-        case 'f':
-            limit_numframes = atoi(optarg);
-            break;
-        default:
-            print_help();
-            break;
-        }
-    }
+  if (optind >= argc)
+  {
+    fprintf(stderr, "Error getting program options, try --help.\n");
+    exit(EXIT_FAILURE);
+  }
 
+  outfile = fopen(output_file, "wb");
 
-    if(optind >= argc)
-    {
-        fprintf(stderr, "Error getting program options, try --help.\n");
-        exit(EXIT_FAILURE);
-    }
+  if (outfile == NULL)
+  {
+    perror("fopen");
+    exit(EXIT_FAILURE);
+  }
 
-    outfile = fopen(output_file, "wb");
-    if(outfile == NULL)
-    {
-        perror("fopen");
-        exit(EXIT_FAILURE);
-    }
+  struct c63_common *cm = init_c63_enc(width, height);
+  cm->e_ctx.fp = outfile;
 
+  /* Calculate the padded width and height */
+  ypw = (uint32_t)(ceil(width/8.0f)*8);
+  yph = (uint32_t)(ceil(height/8.0f)*8);
+  upw = (uint32_t)(ceil(width*UX/(YX*8.0f))*8);
+  uph = (uint32_t)(ceil(height*UY/(YY*8.0f))*8);
+  vpw = (uint32_t)(ceil(width*VX/(YX*8.0f))*8);
+  vph = (uint32_t)(ceil(height*VY/(YY*8.0f))*8);
 
-    struct c63_common *cm = init_c63_enc(width, height);
-    cm->e_ctx.fp = outfile;
+  input_file = argv[optind];
 
+  if (limit_numframes) { printf("Limited to %d frames.\n", limit_numframes); }
 
-    /* Calculate the padded width and height */
-    ypw = (uint32_t)(ceil(width/8.0f)*8);
-    yph = (uint32_t)(ceil(height/8.0f)*8);
-    upw = (uint32_t)(ceil(width*UX/(YX*8.0f))*8);
-    uph = (uint32_t)(ceil(height*UY/(YY*8.0f))*8);
-    vpw = (uint32_t)(ceil(width*VX/(YX*8.0f))*8);
-    vph = (uint32_t)(ceil(height*VY/(YY*8.0f))*8);
+  FILE *infile = fopen(input_file, "rb");
 
-    input_file = argv[optind];
+  if(infile == NULL)
+  {
+    perror("fopen");
+    exit(EXIT_FAILURE);
+  }
 
-    if (limit_numframes)
-        fprintf(stderr, "Limited to %d frames.\n", limit_numframes);
+  /* Encode input frames */
+  int numframes = 0;
 
-    FILE *infile = fopen(input_file, "rb");
+  while (!feof(infile))
+  {
+    image = read_yuv(infile);
 
-    if(infile == NULL)
-    {
-        perror("fopen");
-        exit(EXIT_FAILURE);
-    }
+    if (!image) { break; }
 
+    printf("Encoding frame %d, ", numframes);
+    c63_encode_image(cm, image);
 
-    /* Encode input frames */
-    int numframes = 0;;
-    while(!feof(infile))
-    {
-        image = read_yuv(infile);
+    free(image->Y);
+    free(image->U);
+    free(image->V);
+    free(image);
 
-        if (!image) {
-            break;
-        }
+    printf("Done!\n");
 
-        fprintf(stderr, "Encoding frame %d, ", numframes);
-        c63_encode_image(cm, image);
+    ++numframes;
 
-        free(image->Y);
-        free(image->U);
-        free(image->V);
-        free(image);
+    if (limit_numframes && numframes >= limit_numframes) { break; }
+  }
 
-        fprintf(stderr, "Done!\n");
+  fclose(outfile);
+  fclose(infile);
 
-        ++numframes;
-        if (limit_numframes && numframes >= limit_numframes)
-            break;
-    }
+  //int i, j;
+  //for (i = 0; i < 2; ++i)
+  //{
+  //  printf("int freq[] = {");
+  //  for (j = 0; j < ARRAY_SIZE(frequencies[i]); ++j)
+  //  {
+  //    printf("%d, ", frequencies[i][j]);
+  //  }
+  //  printf("};\n");
+  //}
 
-    fclose(outfile);
-    fclose(infile);
-//
-//    int i,j;
-//    for (i=0; i<2; ++i)
-//    {
-//        printf("int freq[] = {");
-//        for (j=0; j<ARRAY_SIZE(frequencies[i]); ++j)
-//            printf("%d, ", frequencies[i][j]);
-//        printf("};\n");
-//    }
-//
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
