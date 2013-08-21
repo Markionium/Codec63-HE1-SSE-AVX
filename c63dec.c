@@ -62,54 +62,56 @@ static uint8_t get_vlc_token(struct entropy_ctx *c, uint16_t *table,
    of our ACVLC_Size table. Does not work with a general table, so use the
    unoptimized get_vlc_token. A better approach would be to use an index table.
  */
-static uint8_t get_vlc_token_ac(struct entropy_ctx *c, uint16_t table[HUFF_AC_ZERO][HUFF_AC_SIZE], uint8_t table_sz[HUFF_AC_ZERO][HUFF_AC_SIZE])
+static uint8_t get_vlc_token_ac(struct entropy_ctx *c,
+    uint16_t table[HUFF_AC_ZERO][HUFF_AC_SIZE],
+    uint8_t table_sz[HUFF_AC_ZERO][HUFF_AC_SIZE])
 {
-    uint16_t bits = 0;
+  int n, x, y;
+  uint16_t bits = 0;
 
-    int n;
-    int x,y;
-    for (n=1; n <= 16; ++n)
+  for (n = 1; n <= 16; ++n)
+  {
+    bits <<= 1;
+    bits |= get_bits(c, 1);
+
+    uint16_t mask = (1 << n) - 1;
+
+    for (x = 1; x < HUFF_AC_SIZE; ++x)
     {
-        bits <<= 1;
-        bits |= get_bits(c, 1);
-
-        uint16_t mask = (1 << n) - 1;
-
-        for (x=1; x<HUFF_AC_SIZE; ++x)
+      for (y = 0; y < HUFF_AC_ZERO; ++y)
+      {
+        if (table_sz[y][x] < n)
         {
-            for (y=0; y<HUFF_AC_ZERO; ++y)
-            {
-                if(table_sz[y][x] < n)
-                    continue;
-                else if (table_sz[y][x] > n)
-                    break;
-                else if (bits == (table[y][x] & mask))
-                {
-                    /* Found it */
-                    return y*HUFF_AC_SIZE + x;
-                }
-            }
-
-            if (table_sz[x][0] > n)
-                break;
+          continue;
         }
-
-        /* Check if it's a special token (bitsize 0) */
-        for (y=0; y<HUFF_AC_ZERO; y+=(HUFF_AC_ZERO-1))
+        else if (table_sz[y][x] > n)
         {
-            if (table_sz[y][0] == n && bits == (table[y][0] & mask))
-                {
-                    /* Found it */
-                    return y*HUFF_AC_SIZE;
-                }
+          break;
         }
+        else if (bits == (table[y][x] & mask))
+        {
+          /* Found it */
+          return y*HUFF_AC_SIZE + x;
+        }
+      }
+
+      if (table_sz[x][0] > n) { break; }
     }
 
-    printf("VLC token not found (ac).\n");
-    exit(1);
+    /* Check if it's a special token (bitsize 0) */
+    for (y = 0; y < HUFF_AC_ZERO; y += (HUFF_AC_ZERO-1))
+    {
+      if (table_sz[y][0] == n && bits == (table[y][0] & mask))
+      {
+        /* Found it */
+        return y*HUFF_AC_SIZE;
+      }
+    }
+  }
+
+  printf("VLC token not found (ac).\n");
+  exit(EXIT_FAILURE);
 }
-
-
 
 /* Decode sign of value from VLC. See Figure F.12 in spec. */
 static int16_t extend_sign(int16_t v, int sz)
