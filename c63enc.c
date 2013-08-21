@@ -1,16 +1,15 @@
+#include <assert.h>
+#include <errno.h>
+#include <getopt.h>
+#include <limits.h>
+#include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <getopt.h>
-#include <errno.h>
-#include <stdint.h>
-#include <math.h>
-#include <assert.h>
-#include <limits.h>
 
 #include "c63.h"
 #include "tables.h"
-
 
 static char *output_file, *input_file;
 FILE *outfile;
@@ -19,6 +18,7 @@ static int limit_numframes = 0;
 
 static uint32_t width;
 static uint32_t height;
+
 static uint32_t yph;
 static uint32_t ypw;
 static uint32_t uph;
