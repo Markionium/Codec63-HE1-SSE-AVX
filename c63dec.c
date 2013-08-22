@@ -284,13 +284,13 @@ void parse_dqt(struct c63_common *cm)
 // Start of scan
 void parse_sos(struct c63_common *cm)
 {
-    uint16_t size;
-    size = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
+  uint16_t size;
+  size = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
 
-    /* Don't care currently */
+  /* Don't care currently */
 
-    uint8_t buf[size];
-    read_bytes(cm->e_ctx.fp, buf, size-2);
+  uint8_t buf[size];
+  read_bytes(cm->e_ctx.fp, buf, size-2);
 }
 
 // Baseline DCT
