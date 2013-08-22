@@ -115,25 +115,25 @@ static void write_DHT(struct c63_common *cm)
 
 static void write_SOS(struct c63_common *cm)
 {
-    int16_t size = 6 + 2 * COLOR_COMPONENTS;
+  int16_t size = 6 + 2 * COLOR_COMPONENTS;
 
-    put_byte(cm->e_ctx.fp, 0xff);
-    put_byte(cm->e_ctx.fp, 0xda);
+  put_byte(cm->e_ctx.fp, 0xff);
+  put_byte(cm->e_ctx.fp, 0xda);
 
-    put_byte(cm->e_ctx.fp, size >> 8);
-    put_byte(cm->e_ctx.fp, size & 0xff);
+  put_byte(cm->e_ctx.fp, size >> 8);
+  put_byte(cm->e_ctx.fp, size & 0xff);
 
-    put_byte(cm->e_ctx.fp, COLOR_COMPONENTS);
+  put_byte(cm->e_ctx.fp, COLOR_COMPONENTS);
 
-    put_byte(cm->e_ctx.fp, 1); /* Component id */
-    put_byte(cm->e_ctx.fp, 0x00); /* DC | AC huff tbl */
-    put_byte(cm->e_ctx.fp, 2); /* Component id */
-    put_byte(cm->e_ctx.fp, 0x11); /* DC | AC huff tbl */
-    put_byte(cm->e_ctx.fp, 3); /* Component id */
-    put_byte(cm->e_ctx.fp, 0x11); /* DC | AC huff tbl */
-    put_byte(cm->e_ctx.fp, 0); /* ss, first AC */
-    put_byte(cm->e_ctx.fp, 63); /* se, last AC */
-    put_byte(cm->e_ctx.fp, 0); /* ah | al */
+  put_byte(cm->e_ctx.fp, 1); /* Component id */
+  put_byte(cm->e_ctx.fp, 0x00); /* DC | AC huff tbl */
+  put_byte(cm->e_ctx.fp, 2); /* Component id */
+  put_byte(cm->e_ctx.fp, 0x11); /* DC | AC huff tbl */
+  put_byte(cm->e_ctx.fp, 3); /* Component id */
+  put_byte(cm->e_ctx.fp, 0x11); /* DC | AC huff tbl */
+  put_byte(cm->e_ctx.fp, 0); /* ss, first AC */
+  put_byte(cm->e_ctx.fp, 63); /* se, last AC */
+  put_byte(cm->e_ctx.fp, 0); /* ah | al */
 }
 
 static void write_EOI(struct c63_common *cm)
