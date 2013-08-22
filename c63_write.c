@@ -138,22 +138,20 @@ static void write_SOS(struct c63_common *cm)
 
 static void write_EOI(struct c63_common *cm)
 {
-    put_byte(cm->e_ctx.fp, 0xff);
-    put_byte(cm->e_ctx.fp, 0xd9);
+  put_byte(cm->e_ctx.fp, 0xff);
+  put_byte(cm->e_ctx.fp, 0xd9);
 }
 
 static inline uint8_t bit_width(int16_t i)
 {
-    if (__builtin_expect(!i, 0))
-        return 0;
+  if (__builtin_expect(!i, 0)) { return 0; }
 
-    int r = 0;
-    int v = abs(i);
+  int r = 0;
+  int v = abs(i);
 
-    while(v >>= 1)
-        ++r;
+  while (v >>= 1) { ++r; }
 
-    return r+1;
+  return r+1;
 }
 
 
