@@ -296,54 +296,51 @@ void parse_sos(struct c63_common *cm)
 // Baseline DCT
 void parse_sof0(struct c63_common *cm)
 {
-    uint16_t size;
-    size = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
+  uint16_t size;
+  size = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
+  size = size; // Discard size
 
-    // Discard size
-    size = size;
+  uint8_t precision = get_byte(cm->e_ctx.fp);
 
-    uint8_t precision = get_byte(cm->e_ctx.fp);
-    if (precision != 8)
-    {
-        printf("Only 8-bit precision supported\n");
-        exit(1);
-    }
+  if (precision != 8)
+  {
+    fprintf(stderr, "Only 8-bit precision supported\n");
+    exit(EXIT_FAILURE);
+  }
 
-    uint16_t height = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
-    uint16_t width = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
+  uint16_t height = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
+  uint16_t width = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
 
-    // Discard subsampling info. We assume 4:2:0
-    uint8_t buf[10];
-    read_bytes(cm->e_ctx.fp, buf, 10);
+  // Discard subsampling info. We assume 4:2:0
+  uint8_t buf[10];
+  read_bytes(cm->e_ctx.fp, buf, 10);
 
+  /* First frame? */
+  if (cm->framenum == 0)
+  {
+    cm->width = width;
+    cm->height = height;
 
-    /* First frame? */
-    if (cm->framenum == 0)
-    {
-        cm->width = width;
-        cm->height = height;
+    cm->padw[0] = cm->ypw = (uint32_t)(ceil(width/16.0f)*16);
+    cm->padh[0] = cm->yph = (uint32_t)(ceil(height/16.0f)*16);
+    cm->padw[1] = cm->upw = (uint32_t)(ceil(width*UX/(YX*8.0f))*8);
+    cm->padh[1] = cm->uph = (uint32_t)(ceil(height*UY/(YY*8.0f))*8);
+    cm->padw[2] = cm->vpw = (uint32_t)(ceil(width*VX/(YX*8.0f))*8);
+    cm->padh[2] = cm->vph = (uint32_t)(ceil(height*VY/(YY*8.0f))*8);
 
-        cm->padw[0] = cm->ypw = (uint32_t)(ceil(width/16.0f)*16);
-        cm->padh[0] = cm->yph = (uint32_t)(ceil(height/16.0f)*16);
-        cm->padw[1] = cm->upw = (uint32_t)(ceil(width*UX/(YX*8.0f))*8);
-        cm->padh[1] = cm->uph = (uint32_t)(ceil(height*UY/(YY*8.0f))*8);
-        cm->padw[2] = cm->vpw = (uint32_t)(ceil(width*VX/(YX*8.0f))*8);
-        cm->padh[2] = cm->vph = (uint32_t)(ceil(height*VY/(YY*8.0f))*8);
+    cm->mb_cols = cm->ypw / 8;
+    cm->mb_rows = cm->yph / 8;
 
-        cm->mb_cols = cm->ypw / 8;
-        cm->mb_rows = cm->yph / 8;
+    cm->curframe = 0;
+  }
 
-        cm->curframe = 0;
-    }
+  /* Advance to next frame */
+  destroy_frame(cm->refframe);
+  cm->refframe = cm->curframe;
+  cm->curframe = create_frame(cm, 0);
 
-
-    /* Advance to next frame */
-    destroy_frame(cm->refframe);
-    cm->refframe = cm->curframe;
-    cm->curframe = create_frame(cm, 0);
-
-    /* Is this a keyframe */
-    cm->curframe->keyframe = get_byte(cm->e_ctx.fp);
+  /* Is this a keyframe */
+  cm->curframe->keyframe = get_byte(cm->e_ctx.fp);
 }
 
 // Define Huffman tables
