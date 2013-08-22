@@ -1,17 +1,16 @@
+#include <assert.h>
+#include <errno.h>
+#include <getopt.h>
+#include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <getopt.h>
-#include <errno.h>
-#include <stdint.h>
-#include <math.h>
-#include <assert.h>
 
 #include "c63.h"
 #include "tables.h"
 
 int frequencies[2][12];
-
 
 static void write_SOI(struct c63_common *cm)
 {
