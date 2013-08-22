@@ -1,9 +1,9 @@
 #ifndef CPU_MJPEG_H
 #define CPU_MJPEG_H
 
-#include <stdio.h>
-#include <stdint.h>
 #include <inttypes.h>
+#include <stdint.h>
+#include <stdio.h>
 
 #define MAX_FILELENGTH 200
 #define DEFAULT_OUTPUT_FILE "a.mjpg"
