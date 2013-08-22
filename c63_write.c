@@ -77,17 +77,17 @@ static void write_SOF0(struct c63_common *cm)
     put_byte(cm->e_ctx.fp, cm->curframe->keyframe);
 }
 
-static void write_DHT_HTS(struct c63_common *cm, uint8_t id, uint8_t *numlength, uint8_t* data)
+static void write_DHT_HTS(struct c63_common *cm, uint8_t id, uint8_t *numlength,
+    uint8_t* data)
 {
-    /* Find out how many codes we are to write */
-    int i;
-    int n = 0;
-    for(i = 0; i < 16; ++i)
-        n += numlength[i];
+  /* Find out how many codes we are to write */
+  int i, n = 0;
 
-    put_byte(cm->e_ctx.fp, id);
-    put_bytes(cm->e_ctx.fp, numlength, 16);
-    put_bytes(cm->e_ctx.fp, data, n);
+  for(i = 0; i < 16; ++i) { n += numlength[i]; }
+
+  put_byte(cm->e_ctx.fp, id);
+  put_bytes(cm->e_ctx.fp, numlength, 16);
+  put_bytes(cm->e_ctx.fp, data, n);
 }
 
 static void write_DHT(struct c63_common *cm)
