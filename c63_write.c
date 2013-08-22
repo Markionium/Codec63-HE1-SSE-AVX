@@ -329,21 +329,21 @@ static void write_interleaved_data(struct c63_common *cm)
 
 void write_frame(struct c63_common *cm)
 {
-    /* Write headers */
+  /* Write headers */
 
-    /* Start Of Image */
-    write_SOI(cm);
-    /* Define Quantization Table(s) */
-    write_DQT(cm);
-    /* Start Of Frame 0(Baseline DCT) */
-    write_SOF0(cm);
-    /* Define Huffman Tables(s) */
-    write_DHT(cm);
-    /* Start of Scan */
-    write_SOS(cm);
+  /* Start Of Image */
+  write_SOI(cm);
+  /* Define Quantization Table(s) */
+  write_DQT(cm);
+  /* Start Of Frame 0(Baseline DCT) */
+  write_SOF0(cm);
+  /* Define Huffman Tables(s) */
+  write_DHT(cm);
+  /* Start of Scan */
+  write_SOS(cm);
 
-    write_interleaved_data(cm);
+  write_interleaved_data(cm);
 
-    /* End Of Image */
-    write_EOI(cm);
+  /* End Of Image */
+  write_EOI(cm);
 }
