@@ -357,53 +357,60 @@ void parse_dht(struct c63_common *cm)
 
 int parse_c63_frame(struct c63_common *cm)
 {
-    // SOI
-    if (get_byte(cm->e_ctx.fp) != MARKER_START || get_byte(cm->e_ctx.fp) != MARKER_SOI)
+  // SOI
+  if (get_byte(cm->e_ctx.fp) != MARKER_START ||
+      get_byte(cm->e_ctx.fp) != MARKER_SOI)
+  {
+    fprintf(stderr, "Not an JPEG file\n");
+    exit(EXIT_FAILURE);
+  }
+
+  while(1)
+  {
+    int c;
+    c = get_byte(cm->e_ctx.fp);
+
+    if (c == 0) { c = get_byte(cm->e_ctx.fp); }
+
+    if (c != MARKER_START)
     {
-        fprintf(stderr, "Not an JPEG file\n");
-        exit(1);
+      fprintf(stderr, "Expected marker.\n");
+      exit(EXIT_FAILURE);
     }
 
-    while(1)
+    uint8_t marker = get_byte(cm->e_ctx.fp);
+
+    if (marker == MARKER_DQT)
     {
-        int c;
-        c = get_byte(cm->e_ctx.fp);
-
-        if (c == 0)
-            c = get_byte(cm->e_ctx.fp);
-
-        if (c != MARKER_START)
-        {
-            fprintf(stderr, "Expected marker.\n");
-            exit(1);
-        }
-
-        uint8_t marker = get_byte(cm->e_ctx.fp);
-
-        if (marker == MARKER_DQT)
-            parse_dqt(cm);
-        else if (marker == MARKER_SOS) {
-            parse_sos(cm);
-            read_interleaved_data(cm);
-            cm->e_ctx.bit_buffer = cm->e_ctx.bit_buffer_width = 0;
-        }
-        else if (marker == MARKER_SOF0)
-            parse_sof0(cm);
-        else if (marker == MARKER_DHT)
-            parse_dht(cm);
-        else if (marker == MARKER_EOI)
-            return 1;
-        else
-        {
-            fprintf(stderr, "Invalid marker: 0x%02x\n", marker);
-            exit(1);
-        }
-
+      parse_dqt(cm);
     }
+    else if (marker == MARKER_SOS)
+    {
+      parse_sos(cm);
+      read_interleaved_data(cm);
+      cm->e_ctx.bit_buffer = cm->e_ctx.bit_buffer_width = 0;
+    }
+    else if (marker == MARKER_SOF0)
+    {
+      parse_sof0(cm);
+    }
+    else if (marker == MARKER_DHT)
+    {
+      parse_dht(cm);
+    }
+    else if (marker == MARKER_EOI)
+    {
+      return 1;
+    }
+    else
+    {
+      fprintf(stderr, "Invalid marker: 0x%02x\n", marker);
+      exit(EXIT_FAILURE);
+    }
+  }
 
-    return 1;
+  return 1;
 }
-
 
 void decode_c63_frame(struct c63_common *cm, FILE *fout)
 {
