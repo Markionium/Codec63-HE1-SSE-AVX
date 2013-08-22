@@ -346,12 +346,13 @@ void parse_sof0(struct c63_common *cm)
 // Define Huffman tables
 void parse_dht(struct c63_common *cm)
 {
-    uint16_t size;
-    size = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
+  uint16_t size;
+  size = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
 
-    // XXX: Should be handeled properly. However, we currently only use static tables
-    uint8_t buf[size];
-    read_bytes(cm->e_ctx.fp, buf, size-2);
+  // XXX: Should be handeled properly. However, we currently only use static
+  // tables
+  uint8_t buf[size];
+  read_bytes(cm->e_ctx.fp, buf, size-2);
 }
 
 int parse_c63_frame(struct c63_common *cm)
