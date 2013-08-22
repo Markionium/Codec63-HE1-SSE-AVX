@@ -446,39 +446,31 @@ static void print_help(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+  if(argc < 3 || argc > 3) { print_help(argc, argv); }
 
-    if(argc < 3 || argc > 3)
-    {
-        print_help(argc, argv);
-    }
+  FILE *fin = fopen(argv[1], "rb");
+  FILE *fout = fopen(argv[2], "wb");
 
-    FILE *fin = fopen(argv[1], "rb");
-    if (!fin) {
-        perror("fopen");
-        exit(1);
-    }
+  if (!fin || !fout)
+  {
+    perror("fopen");
+    exit(EXIT_FAILURE);
+  }
 
-    FILE *fout = fopen(argv[2], "wb");
-    if (!fout) {
-        perror("fopen");
-        exit(1);
-    }
+  struct c63_common *cm = calloc(1, sizeof(*cm));
+  cm->e_ctx.fp = fin;
 
-    struct c63_common *cm = calloc(1, sizeof(struct c63_common));
-    cm->e_ctx.fp = fin;
+  int framenum = 0;
+  while(!feof(fin))
+  {
+    printf("Decoding frame %d\n", framenum++);
 
-    int framenum = 0;
-    while(!feof(fin))
-    {
-        printf("Decoding frame %d\n", framenum++);
+    parse_c63_frame(cm);
+    decode_c63_frame(cm, fout);
+  }
 
-        parse_c63_frame(cm);
-        decode_c63_frame(cm, fout);
-    }
+  fclose(fin);
+  fclose(fout);
 
-
-    fclose(fin);
-    fclose(fout);
-
-    return 0;
+  return 0;
 }
