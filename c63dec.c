@@ -236,22 +236,25 @@ static void read_interleaved_data_MCU(struct c63_common *cm, int16_t *dct,
 
 void read_interleaved_data(struct c63_common *cm)
 {
-    int16_t prev_DC[3] = {0, 0, 0};
-    int u,v;
+  int u,v;
+  int16_t prev_DC[3] = {0, 0, 0};
 
-    uint32_t ublocks = (uint32_t) (ceil(cm->ypw/(float)(8.0f*2)));
-    uint32_t vblocks = (uint32_t) (ceil(cm->yph/(float)(8.0f*2)));
+  uint32_t ublocks = (uint32_t) (ceil(cm->ypw/(float)(8.0f*2)));
+  uint32_t vblocks = (uint32_t) (ceil(cm->yph/(float)(8.0f*2)));
 
-    /* Write the MCU's interleaved */
-    for(v = 0; v < vblocks; ++v)
+  /* Write the MCU's interleaved */
+  for(v = 0; v < vblocks; ++v)
+  {
+    for(u = 0; u < ublocks; ++u)
     {
-        for(u = 0; u < ublocks; ++u)
-        {
-            read_interleaved_data_MCU(cm, cm->curframe->residuals->Ydct, cm->ypw, cm->yph, YX, YY, u, v, &prev_DC[0], 0, 0);
-            read_interleaved_data_MCU(cm, cm->curframe->residuals->Udct, cm->upw, cm->uph, UX, UY, u, v, &prev_DC[1], 1, 1);
-            read_interleaved_data_MCU(cm, cm->curframe->residuals->Vdct, cm->vpw, cm->vph, VX, VY, u, v, &prev_DC[2], 1, 2);
-        }
+      read_interleaved_data_MCU(cm, cm->curframe->residuals->Ydct, cm->ypw,
+          cm->yph, YX, YY, u, v, &prev_DC[0], 0, 0);
+      read_interleaved_data_MCU(cm, cm->curframe->residuals->Udct, cm->upw,
+          cm->uph, UX, UY, u, v, &prev_DC[1], 1, 1);
+      read_interleaved_data_MCU(cm, cm->curframe->residuals->Vdct, cm->vpw,
+          cm->vph, VX, VY, u, v, &prev_DC[2], 1, 2);
     }
+  }
 }
 
 // Define quantization tables
