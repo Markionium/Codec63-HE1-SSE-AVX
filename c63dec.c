@@ -260,24 +260,25 @@ void read_interleaved_data(struct c63_common *cm)
 // Define quantization tables
 void parse_dqt(struct c63_common *cm)
 {
-    uint16_t size;
-    size = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
+  int i;
+  uint16_t size;
 
-    // Discard size
-    size = size;
+  size = (get_byte(cm->e_ctx.fp) << 8) | get_byte(cm->e_ctx.fp);
+  // Discard size
+  size = size; /* huh? */
 
-    int i;
-    for (i=0; i<3; ++i)
+  for (i = 0; i < 3; ++i)
+  {
+    int idx = get_byte(cm->e_ctx.fp);
+
+    if (idx != i)
     {
-        int idx = get_byte(cm->e_ctx.fp);
-        if (idx != i)
-        {
-            fprintf(stderr, "DQT: Expected %d - got %d\n", i, idx);
-            exit(1);
-        }
-
-        read_bytes(cm->e_ctx.fp, cm->quanttbl[i], 64);
+      fprintf(stderr, "DQT: Expected %d - got %d\n", i, idx);
+      exit(EXIT_FAILURE);
     }
+
+    read_bytes(cm->e_ctx.fp, cm->quanttbl[i], 64);
+  }
 }
 
 // Start of scan
