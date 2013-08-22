@@ -298,30 +298,33 @@ static void write_interleaved_data_MCU(struct c63_common *cm, int16_t *dct, uint
 
 static void write_interleaved_data(struct c63_common *cm)
 {
-    int16_t prev_DC[3] = {0, 0, 0};
-    uint32_t u, v;
+  int16_t prev_DC[3] = {0, 0, 0};
+  uint32_t u, v;
 
-    /* Set up which huffman tables we want to use */
-    int32_t yhtbl = 0;
-    int32_t uhtbl = 1;
-    int32_t vhtbl = 1;
+  /* Set up which huffman tables we want to use */
+  int32_t yhtbl = 0;
+  int32_t uhtbl = 1;
+  int32_t vhtbl = 1;
 
-    /* Find the number of MCU's for the intensity */
-    uint32_t ublocks = (uint32_t) (ceil(cm->ypw/(float)(8.0f*YX)));
-    uint32_t vblocks = (uint32_t) (ceil(cm->yph/(float)(8.0f*YY)));
+  /* Find the number of MCU's for the intensity */
+  uint32_t ublocks = (uint32_t) (ceil(cm->ypw/(float)(8.0f*YX)));
+  uint32_t vblocks = (uint32_t) (ceil(cm->yph/(float)(8.0f*YY)));
 
-    /* Write the MCU's interleaved */
-    for(v = 0; v < vblocks; ++v)
+  /* Write the MCU's interleaved */
+  for(v = 0; v < vblocks; ++v)
+  {
+    for(u = 0; u < ublocks; ++u)
     {
-        for(u = 0; u < ublocks; ++u)
-        {
-            write_interleaved_data_MCU(cm, cm->curframe->residuals->Ydct, cm->ypw, cm->yph, YX, YY, u, v, &prev_DC[0], yhtbl, 0);
-            write_interleaved_data_MCU(cm, cm->curframe->residuals->Udct, cm->upw, cm->uph, UX, UY, u, v, &prev_DC[1], uhtbl, 1);
-            write_interleaved_data_MCU(cm, cm->curframe->residuals->Vdct, cm->vpw, cm->vph, VX, VY, u, v, &prev_DC[2], vhtbl, 2);
-        }
+      write_interleaved_data_MCU(cm, cm->curframe->residuals->Ydct, cm->ypw,
+          cm->yph, YX, YY, u, v, &prev_DC[0], yhtbl, 0);
+      write_interleaved_data_MCU(cm, cm->curframe->residuals->Udct, cm->upw,
+          cm->uph, UX, UY, u, v, &prev_DC[1], uhtbl, 1);
+      write_interleaved_data_MCU(cm, cm->curframe->residuals->Vdct, cm->vpw,
+          cm->vph, VX, VY, u, v, &prev_DC[2], vhtbl, 2);
     }
+  }
 
-    flush_bits(&cm->e_ctx);
+  flush_bits(&cm->e_ctx);
 }
 
 void write_frame(struct c63_common *cm)
