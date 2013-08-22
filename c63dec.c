@@ -438,13 +438,12 @@ void decode_c63_frame(struct c63_common *cm, FILE *fout)
 
 static void print_help(int argc, char **argv)
 {
-    fprintf(stderr, "Usage: %s input.c63 output.yuv\n", argv[0]);
-    fprintf(stderr, "\n");
-    fprintf(stderr, "Tip! Use mplayer to playback raw YUV file: \n  mplayer -demuxer rawvideo -rawvideo w=352:h=288 foreman.yuv\n");
-    fprintf(stderr, "\n");
-
-    exit(EXIT_FAILURE);
+  printf("Usage: %s input.c63 output.yuv\n\n", argv[0]);
+  printf("Tip! Use mplayer to playback raw YUV file:\n");
+  printf("mplayer -demuxer rawvideo -rawvideo w=352:h=288 foreman.yuv\n\n");
+  exit(EXIT_FAILURE);
 }
+
 int main(int argc, char **argv)
 {
 
