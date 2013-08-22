@@ -213,11 +213,12 @@ static void read_block(struct c63_common *cm, int16_t *out_data, uint32_t width,
 #endif
 }
 
-static void read_interleaved_data_MCU(struct c63_common *cm, int16_t *dct, uint32_t wi, uint32_t he,
-				       uint32_t h, uint32_t v, uint32_t x,
-				       uint32_t y, int16_t *prev_DC, int32_t cc, int channel)
+static void read_interleaved_data_MCU(struct c63_common *cm, int16_t *dct,
+    uint32_t wi, uint32_t he, uint32_t h, uint32_t v, uint32_t x, uint32_t y,
+    int16_t *prev_DC, int32_t cc, int channel)
 {
   uint32_t i, j, ii, jj;
+
   for(j = y*v*8; j < (y+1)*v*8; j += 8)
   {
     jj = he-8;
