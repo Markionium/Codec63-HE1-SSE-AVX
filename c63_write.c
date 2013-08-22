@@ -14,28 +14,28 @@ int frequencies[2][12];
 
 static void write_SOI(struct c63_common *cm)
 {
-    put_byte(cm->e_ctx.fp, 0xff);
-    put_byte(cm->e_ctx.fp, 0xd8);
+  put_byte(cm->e_ctx.fp, 0xff);
+  put_byte(cm->e_ctx.fp, 0xd8);
 }
 
 static void write_DQT(struct c63_common *cm)
 {
-    int16_t size = 2 + (3 * 65);
+  int16_t size = 2 + (3 * 65);
 
-    put_byte(cm->e_ctx.fp, 0xff);
-    put_byte(cm->e_ctx.fp, 0xdb);
+  put_byte(cm->e_ctx.fp, 0xff);
+  put_byte(cm->e_ctx.fp, 0xdb);
 
-    put_byte(cm->e_ctx.fp, size >> 8);
-    put_byte(cm->e_ctx.fp, size & 0xff);
+  put_byte(cm->e_ctx.fp, size >> 8);
+  put_byte(cm->e_ctx.fp, size & 0xff);
 
-    put_byte(cm->e_ctx.fp, 0);
-    put_bytes(cm->e_ctx.fp, cm->quanttbl[0], 64);
+  put_byte(cm->e_ctx.fp, 0);
+  put_bytes(cm->e_ctx.fp, cm->quanttbl[0], 64);
 
-    put_byte(cm->e_ctx.fp, 1);
-    put_bytes(cm->e_ctx.fp, cm->quanttbl[1], 64);
+  put_byte(cm->e_ctx.fp, 1);
+  put_bytes(cm->e_ctx.fp, cm->quanttbl[1], 64);
 
-    put_byte(cm->e_ctx.fp, 2);
-    put_bytes(cm->e_ctx.fp, cm->quanttbl[2], 64);
+  put_byte(cm->e_ctx.fp, 2);
+  put_bytes(cm->e_ctx.fp, cm->quanttbl[2], 64);
 }
 
 static void write_SOF0(struct c63_common *cm)
