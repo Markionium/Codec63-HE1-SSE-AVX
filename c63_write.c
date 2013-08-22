@@ -92,21 +92,25 @@ static void write_DHT_HTS(struct c63_common *cm, uint8_t id, uint8_t *numlength,
 
 static void write_DHT(struct c63_common *cm)
 {
-    int16_t size = 0x01A2; /* 2 + n*(17+mi); */
+  int16_t size = 0x01A2; /* 2 + n*(17+mi); */
 
-    /* Define Huffman Table marker */
-    put_byte(cm->e_ctx.fp, 0xff);
-    put_byte(cm->e_ctx.fp, 0xc4);
+  /* Define Huffman Table marker */
+  put_byte(cm->e_ctx.fp, 0xff);
+  put_byte(cm->e_ctx.fp, 0xc4);
 
-    /* Length of segment */
-    put_byte(cm->e_ctx.fp, size >> 8);
-    put_byte(cm->e_ctx.fp, size & 0xff);
+  /* Length of segment */
+  put_byte(cm->e_ctx.fp, size >> 8);
+  put_byte(cm->e_ctx.fp, size & 0xff);
 
-    /* Write the four huffman table specifications */
-    write_DHT_HTS(cm, 0x00, DCVLC_num_by_length[0], DCVLC_data[0]); /* DC table 0 */
-    write_DHT_HTS(cm, 0x01, DCVLC_num_by_length[1], DCVLC_data[1]); /* DC table 1 */
-    write_DHT_HTS(cm, 0x10, ACVLC_num_by_length[0], ACVLC_data[0]); /* AC table 0 */
-    write_DHT_HTS(cm, 0x11, ACVLC_num_by_length[1], ACVLC_data[1]); /* AC table 1 */
+  /* Write the four huffman table specifications */
+  /* DC table 0 */
+  write_DHT_HTS(cm, 0x00, DCVLC_num_by_length[0], DCVLC_data[0]);
+  /* DC table 1 */
+  write_DHT_HTS(cm, 0x01, DCVLC_num_by_length[1], DCVLC_data[1]);
+  /* AC table 0 */
+  write_DHT_HTS(cm, 0x10, ACVLC_num_by_length[0], ACVLC_data[0]);
+  /* AC table 1 */
+  write_DHT_HTS(cm, 0x11, ACVLC_num_by_length[1], ACVLC_data[1]);
 }
 
 static void write_SOS(struct c63_common *cm)
