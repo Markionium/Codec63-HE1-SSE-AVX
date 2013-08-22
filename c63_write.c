@@ -155,118 +155,125 @@ static inline uint8_t bit_width(int16_t i)
 }
 
 
-static void write_block(struct c63_common *cm, int16_t *in_data, uint32_t width, uint32_t height,
-        uint32_t uoffset, uint32_t voffset, int16_t *prev_DC,
-        int32_t cc, int channel)
+static void write_block(struct c63_common *cm, int16_t *in_data, uint32_t width,
+    uint32_t height, uint32_t uoffset, uint32_t voffset, int16_t *prev_DC,
+    int32_t cc, int channel)
 {
-    uint32_t i, j;
+  uint32_t i, j;
 
-    /* Write motion vector */
-    struct macroblock *mb = &cm->curframe->mbs[channel][voffset/8 * cm->padw[channel]/8 + uoffset/8];
+  /* Write motion vector */
+  struct macroblock *mb =
+    &cm->curframe->mbs[channel][voffset/8 * cm->padw[channel]/8 + uoffset/8];
 
-    /* Use inter pred? */
-    put_bits(&cm->e_ctx, mb->use_mv, 1);
+  /* Use inter pred? */
+  put_bits(&cm->e_ctx, mb->use_mv, 1);
 
-    if (mb->use_mv)
+  if (mb->use_mv)
+  {
+    int reuse_prev_mv = 0;
+
+    if (uoffset &&
+        (mb-1)->use_mv &&
+        (mb-1)->mv_x == mb->mv_x &&
+        (mb-1)->mv_y == mb->mv_y)
     {
-        int reuse_prev_mv = 0;
-        if (uoffset && (mb-1)->use_mv && (mb-1)->mv_x == mb->mv_x && (mb-1)->mv_y == mb->mv_y )
-            reuse_prev_mv = 1;
-
-        put_bits(&cm->e_ctx, reuse_prev_mv, 1);
-
-        if (!reuse_prev_mv)
-        {
-            uint8_t sz;
-            int16_t val;
-
-            /* Encode MV x-coord */
-            val = mb->mv_x;
-            sz = bit_width(val);
-            if (val < 0)
-                --val;
-
-            put_bits(&cm->e_ctx, MVVLC[sz], MVVLC_Size[sz]);
-            put_bits(&cm->e_ctx, val, sz);
-//            ++frequencies[cc][sz];
-
-            /* Encode MV y-coord */
-            val = mb->mv_y;
-            sz = bit_width(val);
-            if (val < 0)
-                --val;
-
-            put_bits(&cm->e_ctx, MVVLC[sz], MVVLC_Size[sz]);
-            put_bits(&cm->e_ctx, val, sz);
-//            ++frequencies[cc][sz];
-        }
+      reuse_prev_mv = 1;
     }
 
-    /* Write residuals */
+    put_bits(&cm->e_ctx, reuse_prev_mv, 1);
 
-    /* Residuals stored linear in memory */
-    int16_t *block = &in_data[uoffset * 8 + voffset * width];
-    int32_t num_ac = 0;
+    if (!reuse_prev_mv)
+    {
+      uint8_t sz;
+      int16_t val;
+
+      /* Encode MV x-coord */
+      val = mb->mv_x;
+      sz = bit_width(val);
+      if (val < 0) { --val; }
+
+      put_bits(&cm->e_ctx, MVVLC[sz], MVVLC_Size[sz]);
+      put_bits(&cm->e_ctx, val, sz);
+      /* ++frequencies[cc][sz]; */
+
+      /* Encode MV y-coord */
+      val = mb->mv_y;
+      sz = bit_width(val);
+      if (val < 0) { --val; }
+
+      put_bits(&cm->e_ctx, MVVLC[sz], MVVLC_Size[sz]);
+      put_bits(&cm->e_ctx, val, sz);
+      /* ++frequencies[cc][sz]; */
+    }
+  }
+
+  /* Write residuals */
+
+  /* Residuals stored linear in memory */
+  int16_t *block = &in_data[uoffset * 8 + voffset * width];
+  int32_t num_ac = 0;
 
 #if 0
-    static int blocknum;
-    ++blocknum;
-    printf("Dump block %d:\n", blocknum);
+  static int blocknum;
+  ++blocknum;
 
-    for(i=0; i<8; ++i) {
-        for (j=0; j<8; ++j)
-            printf(", %5d", block[i*8+j]);
-        printf("\n");
+  printf("Dump block %d:\n", blocknum);
+
+  for(i=0; i<8; ++i)
+  {
+    for (j=0; j<8; ++j)
+    {
+      printf(", %5d", block[i*8+j]);
     }
-    printf("Finished block\n\n");
+    printf("\n");
+  }
+
+  printf("Finished block\n\n");
 #endif
 
-    /* Calculate DC component, and write to stream */
-    int16_t dc = block[0] - *prev_DC;
-    *prev_DC = block[0];
-    uint8_t size = bit_width(dc);
-    put_bits(&cm->e_ctx, DCVLC[cc][size],DCVLC_Size[cc][size]);
+  /* Calculate DC component, and write to stream */
+  int16_t dc = block[0] - *prev_DC;
+  *prev_DC = block[0];
 
-    if(dc < 0)
-        dc = dc - 1;
-    put_bits(&cm->e_ctx, dc, size);
+  uint8_t size = bit_width(dc);
+  put_bits(&cm->e_ctx, DCVLC[cc][size],DCVLC_Size[cc][size]);
 
-    /* find the last nonzero entry of the ac-coefficients */
-    for(j = 64; j > 1 && !block[j-1]; j--)
-        ;
+  if(dc < 0) { dc = dc - 1; }
+  put_bits(&cm->e_ctx, dc, size);
 
-    /* Put the nonzero ac-coefficients */
-    for(i = 1; i < j; i++)
+  /* find the last nonzero entry of the ac-coefficients */
+  for(j = 64; j > 1 && !block[j-1]; j--);
+
+  /* Put the nonzero ac-coefficients */
+  for(i = 1; i < j; i++)
+  {
+    int16_t ac = block[i];
+    if(ac == 0)
     {
-        int16_t ac = block[i];
-        if(ac == 0)
-        {
-            if(++num_ac == 16)
-            {
-                put_bits(&cm->e_ctx, ACVLC[cc][15][0], ACVLC_Size[cc][15][0]);
-
-                num_ac = 0;
-            }
-        }
-        else
-        {
-            uint8_t size = bit_width(ac);
-            put_bits(&cm->e_ctx, ACVLC[cc][num_ac][size], ACVLC_Size[cc][num_ac][size]);
-
-            if(ac < 0)
-                --ac;
-
-            put_bits(&cm->e_ctx, ac, size);
-
-            num_ac = 0;
-        }
+      if(++num_ac == 16)
+      {
+        put_bits(&cm->e_ctx, ACVLC[cc][15][0], ACVLC_Size[cc][15][0]);
+        num_ac = 0;
+      }
     }
-
-    /* Put end of block marker */
-    if(j < 64)
+    else
     {
-        put_bits(&cm->e_ctx, ACVLC[cc][0][0], ACVLC_Size[cc][0][0]);
+      uint8_t size = bit_width(ac);
+      put_bits(&cm->e_ctx, ACVLC[cc][num_ac][size],
+          ACVLC_Size[cc][num_ac][size]);
+
+      if(ac < 0) { --ac; }
+
+      put_bits(&cm->e_ctx, ac, size);
+      num_ac = 0;
     }
+  }
+
+  /* Put end of block marker */
+  if(j < 64)
+  {
+    put_bits(&cm->e_ctx, ACVLC[cc][0][0], ACVLC_Size[cc][0][0]);
+  }
 }
 
 static void write_interleaved_data_MCU(struct c63_common *cm, int16_t *dct, uint32_t wi, uint32_t he,
