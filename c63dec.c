@@ -118,7 +118,7 @@ static int16_t extend_sign(int16_t v, int sz)
 {
   int vt = 1 << (sz - 1);
 
-  if (v >= vt) { return v; }
+  if (v >= vt) { return v; }
 
   int range = (1 << sz) - 1;
   v = -(range - v);
