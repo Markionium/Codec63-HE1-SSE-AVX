@@ -31,14 +31,15 @@ void put_bytes(FILE *fp, const void* data, unsigned int len)
 
 uint8_t get_byte(FILE *fp)
 {
-    int status = fgetc(fp);
+  int status = fgetc(fp);
 
-    if (status == EOF) {
-        fprintf(stderr, "End of file.\n");
-        exit(EXIT_FAILURE);
-    }
+  if (status == EOF)
+  {
+    fprintf(stderr, "End of file.\n");
+    exit(EXIT_FAILURE);
+  }
 
-    return status;
+  return status;
 }
 
 int read_bytes(FILE *fp, void *data, unsigned int sz)
