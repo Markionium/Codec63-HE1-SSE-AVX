@@ -44,19 +44,20 @@ uint8_t get_byte(FILE *fp)
 
 int read_bytes(FILE *fp, void *data, unsigned int sz)
 {
-    int status = fread(data, 1, sz, fp);
+  int status = fread(data, 1, sz, fp);
 
-    if (status == EOF)
-    {
-        fprintf(stderr, "End of file.\n");
-        exit(0);
-    }
-    else if (status != sz) {
-        fprintf(stderr, "Error reading bytes\n");
-        exit(EXIT_FAILURE);
-    }
+  if (status == EOF)
+  {
+    fprintf(stderr, "End of file.\n");
+    exit(EXIT_FAILURE);
+  }
+  else if (status != sz)
+  {
+    fprintf(stderr, "Error reading bytes\n");
+    exit(EXIT_FAILURE);
+  }
 
-    return status;
+  return status;
 }
 
 /**
