@@ -8,7 +8,7 @@
 
 static void transpose_block(float *in_data, float *out_data)
 {
-  int i,j;
+  int i, j;
 
   for (i = 0; i < 8; ++i)
   {
