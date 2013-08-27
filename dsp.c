@@ -126,45 +126,41 @@ void dct_quant_block_8x8(int16_t *in_data, int16_t *out_data,
   for (i = 0; i < 64; ++i) { out_data[i] = mb2[i]; }
 }
 
-
-void dequant_idct_block_8x8(int16_t *in_data, int16_t *out_data, uint8_t *quant_tbl)
+void dequant_idct_block_8x8(int16_t *in_data, int16_t *out_data,
+    uint8_t *quant_tbl)
 {
-    float mb[8*8] __attribute((aligned(16)));
-    float mb2[8*8] __attribute((aligned(16)));
+  float mb[8*8] __attribute((aligned(16)));
+  float mb2[8*8] __attribute((aligned(16)));
 
-    int i, v;
+  int i, v;
 
-    for (i=0; i<64; ++i)
-        mb[i] = in_data[i];
+  for (i = 0; i < 64; ++i) { mb[i] = in_data[i]; }
 
-    dequantize_block(mb, mb2, quant_tbl);
+  dequantize_block(mb, mb2, quant_tbl);
+  scale_block(mb2, mb);
 
-    scale_block(mb2, mb);
+  for (v = 0; v < 8; ++v) { idct_1d(mb+v*8, mb2+v*8); }
 
-    for (v=0; v<8; ++v)
-    {
-        idct_1d(mb+v*8, mb2+v*8);
-    }
+  transpose_block(mb2, mb);
 
-    transpose_block(mb2, mb);
+  for (v = 0; v < 8; ++v) { idct_1d(mb+v*8, mb2+v*8); }
 
-    for (v=0; v<8; ++v)
-    {
-        idct_1d(mb+v*8, mb2+v*8);
-    }
+  transpose_block(mb2, mb);
 
-    transpose_block(mb2, mb);
-
-    for (i=0; i<64; ++i)
-        out_data[i] = mb[i];
+  for (i = 0; i < 64; ++i) { out_data[i] = mb[i]; }
 }
 
 void sad_block_8x8(uint8_t *block1, uint8_t *block2, int stride, int *result)
 {
-    *result = 0;
+  int u,v;
 
-    int u,v;
-    for (v=0; v<8; ++v)
-        for (u=0; u<8; ++u)
-            *result += abs(block2[v*stride+u] - block1[v*stride+u]);
+  *result = 0;
+
+  for (v = 0; v < 8; ++v)
+  {
+    for (u = 0; u < 8; ++u)
+    {
+      *result += abs(block2[v*stride+u] - block1[v*stride+u]);
+    }
+  }
 }
