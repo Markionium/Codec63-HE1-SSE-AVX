@@ -39,7 +39,7 @@ uint8_t get_byte(FILE *fp)
     exit(EXIT_FAILURE);
   }
 
-  return status;
+  return (uint8_t) status;
 }
 
 int read_bytes(FILE *fp, void *data, unsigned int sz)
