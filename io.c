@@ -115,13 +115,14 @@ uint16_t get_bits(struct entropy_ctx *c, uint8_t n)
  */
 void flush_bits(struct entropy_ctx *c)
 {
-    if(c->bit_buffer > 0) {
-        uint8_t b = c->bit_buffer << (8 - c->bit_buffer_width);
-        put_byte(c->fp, b);
-        if(b == 0xff)
-            put_byte(c->fp, 0);
-    }
+  if(c->bit_buffer > 0)
+  {
+    uint8_t b = c->bit_buffer << (8 - c->bit_buffer_width);
+    put_byte(c->fp, b);
 
-    c->bit_buffer = 0;
-    c->bit_buffer_width = 0;
+    if(b == 0xff) { put_byte(c->fp, 0); }
+  }
+
+  c->bit_buffer = 0;
+  c->bit_buffer_width = 0;
 }
