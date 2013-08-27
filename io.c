@@ -89,28 +89,26 @@ void put_bits(struct entropy_ctx *c, uint16_t bits, uint8_t n)
 
 uint16_t get_bits(struct entropy_ctx *c, uint8_t n)
 {
-    uint16_t ret = 0;
+  uint16_t ret = 0;
 
-    while(c->bit_buffer_width < n)
-    {
-        uint8_t b = get_byte(c->fp);
-        if (b == 0xff)
-            get_byte(c->fp); // Discard stuffed byte
+  while(c->bit_buffer_width < n)
+  {
+    uint8_t b = get_byte(c->fp);
+    if (b == 0xff) { get_byte(c->fp); } /* Discard stuffed byte */
 
-        c->bit_buffer <<= 8;
-        c->bit_buffer |= b;
-        c->bit_buffer_width += 8;
-    }
+    c->bit_buffer <<= 8;
+    c->bit_buffer |= b;
+    c->bit_buffer_width += 8;
+  }
 
-    ret = c->bit_buffer >> (c->bit_buffer_width - n);
-    c->bit_buffer_width -= n;
+  ret = c->bit_buffer >> (c->bit_buffer_width - n);
+  c->bit_buffer_width -= n;
 
-    /* Clear grabbed bits */
-    c->bit_buffer &= (1 << c->bit_buffer_width) - 1;
+  /* Clear grabbed bits */
+  c->bit_buffer &= (1 << c->bit_buffer_width) - 1;
 
-    return ret;
+  return ret;
 }
-
 
 /**
  * Flushes the bitBuffer by writing zeroes to fill a full byte
