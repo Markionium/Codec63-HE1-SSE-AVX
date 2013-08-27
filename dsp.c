@@ -55,19 +55,19 @@ static void idct_1d(float *in_data, float *out_data)
 
 static void scale_block(float *in_data, float *out_data)
 {
-    int u,v;
+  int u, v;
 
-    for (v=0; v<8; ++v)
+  for (v = 0; v < 8; ++v)
+  {
+    for (u = 0; u < 8; ++u)
     {
-        for (u=0; u<8; ++u)
-        {
-            float a1 = !u ? ISQRT2 : 1.0f;
-            float a2 = !v ? ISQRT2 : 1.0f;
+      float a1 = !u ? ISQRT2 : 1.0f;
+      float a2 = !v ? ISQRT2 : 1.0f;
 
-            /* Scale according to normalizing function */
-            out_data[v*8+u] = in_data[v*8+u] * a1 * a2;
-        }
+      /* Scale according to normalizing function */
+      out_data[v*8+u] = in_data[v*8+u] * a1 * a2;
     }
+  }
 }
 
 static void quantize_block(float *in_data, float *out_data, uint8_t *quant_tbl)
