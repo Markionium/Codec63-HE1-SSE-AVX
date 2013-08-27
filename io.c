@@ -67,22 +67,24 @@ int read_bytes(FILE *fp, void *data, unsigned int sz)
  */
 void put_bits(struct entropy_ctx *c, uint16_t bits, uint8_t n)
 {
-    assert(n <= 24  && "Error writing bit");
+  assert(n <= 24  && "Error writing bit");
 
-    if(n == 0)
-        return;
+  if(n == 0) { return; }
 
-    c->bit_buffer <<= n;
-    c->bit_buffer |= bits & ((1 << n) - 1);
-    c->bit_buffer_width += n;
+  c->bit_buffer <<= n;
+  c->bit_buffer |= bits & ((1 << n) - 1);
+  c->bit_buffer_width += n;
 
-    while(c->bit_buffer_width >= 8) {
-        uint8_t b = (uint8_t)(c->bit_buffer >> (c->bit_buffer_width - 8));
-        put_byte(c->fp, b);
-        if(b == 0xff)
-            put_byte(c->fp, 0);
-        c->bit_buffer_width -= 8;
-    }
+  while(c->bit_buffer_width >= 8)
+  {
+    uint8_t b = (uint8_t)(c->bit_buffer >> (c->bit_buffer_width - 8));
+
+    put_byte(c->fp, b);
+
+    if(b == 0xff) { put_byte(c->fp, 0); }
+
+    c->bit_buffer_width -= 8;
+  }
 }
 
 uint16_t get_bits(struct entropy_ctx *c, uint8_t n)
