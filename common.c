@@ -80,15 +80,16 @@ void dct_quantize_row(uint8_t *in_data, uint8_t *prediction, int w, int h,
   }
 }
 
-void dct_quantize(uint8_t *in_data, uint8_t *prediction,
-        uint32_t width, uint32_t height,
-        int16_t *out_data, uint8_t *quantization)
+void dct_quantize(uint8_t *in_data, uint8_t *prediction, uint32_t width,
+    uint32_t height, int16_t *out_data, uint8_t *quantization)
 {
-    int y;
-    for (y=0; y<height; y+=8)
-    {
-        dct_quantize_row(in_data+y*width, prediction+y*width, width, height, out_data+y*width, quantization);
-    }
+  int y;
+
+  for (y = 0; y < height; y += 8)
+  {
+    dct_quantize_row(in_data+y*width, prediction+y*width, width, height,
+        out_data+y*width, quantization);
+  }
 }
 
 void destroy_frame(struct frame *f)
