@@ -276,24 +276,25 @@ static void write_block(struct c63_common *cm, int16_t *in_data, uint32_t width,
   }
 }
 
-static void write_interleaved_data_MCU(struct c63_common *cm, int16_t *dct, uint32_t wi, uint32_t he,
-        uint32_t h, uint32_t v, uint32_t x,
-        uint32_t y, int16_t *prev_DC, int32_t cc, int channel)
+static void write_interleaved_data_MCU(struct c63_common *cm, int16_t *dct,
+    uint32_t wi, uint32_t he, uint32_t h, uint32_t v, uint32_t x, uint32_t y,
+    int16_t *prev_DC, int32_t cc, int channel)
 {
-    uint32_t i, j, ii, jj;
-    for(j = y*v*8; j < (y+1)*v*8; j += 8)
+  uint32_t i, j, ii, jj;
+
+  for(j = y*v*8; j < (y+1)*v*8; j += 8)
+  {
+    jj = he-8;
+    jj = MIN(j, jj);
+
+    for(i = x*h*8; i < (x+1)*h*8; i += 8)
     {
-        jj = he-8;
-        jj = MIN(j, jj);
+      ii = wi-8;
+      ii = MIN(i, ii);
 
-        for(i = x*h*8; i < (x+1)*h*8; i += 8)
-        {
-            ii = wi-8;
-            ii = MIN(i, ii);
-
-            write_block(cm, dct, wi, he, ii, jj, prev_DC, cc, channel);
-        }
+      write_block(cm, dct, wi, he, ii, jj, prev_DC, cc, channel);
     }
+  }
 }
 
 static void write_interleaved_data(struct c63_common *cm)
