@@ -20,12 +20,13 @@ void put_byte(FILE *fp, int byte)
 
 void put_bytes(FILE *fp, const void* data, unsigned int len)
 {
-    int n = fwrite(data, 1, len, fp);
+  int n = fwrite(data, 1, len, fp);
 
-    if(n != len) {
-        fprintf(stderr, "Error writing bytes\n");
-        exit(-1);
-    }
+  if(n != len)
+  {
+    fprintf(stderr, "Error writing bytes\n");
+    exit(EXIT_FAILURE);
+  }
 }
 
 uint8_t get_byte(FILE *fp)
