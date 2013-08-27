@@ -94,29 +94,29 @@ void dct_quantize(uint8_t *in_data, uint8_t *prediction, uint32_t width,
 
 void destroy_frame(struct frame *f)
 {
-    if (!f) // First frame
-        return;
+  /* first frame */
+  if (!f) { return; }
 
-    free(f->recons->Y);
-    free(f->recons->U);
-    free(f->recons->V);
-    free(f->recons);
+  free(f->recons->Y);
+  free(f->recons->U);
+  free(f->recons->V);
+  free(f->recons);
 
-    free(f->residuals->Ydct);
-    free(f->residuals->Udct);
-    free(f->residuals->Vdct);
-    free(f->residuals);
+  free(f->residuals->Ydct);
+  free(f->residuals->Udct);
+  free(f->residuals->Vdct);
+  free(f->residuals);
 
-    free(f->predicted->Y);
-    free(f->predicted->U);
-    free(f->predicted->V);
-    free(f->predicted);
+  free(f->predicted->Y);
+  free(f->predicted->U);
+  free(f->predicted->V);
+  free(f->predicted);
 
-    free(f->mbs[0]);
-    free(f->mbs[1]);
-    free(f->mbs[2]);
+  free(f->mbs[0]);
+  free(f->mbs[1]);
+  free(f->mbs[2]);
 
-    free(f);
+  free(f);
 }
 
 struct frame* create_frame(struct c63_common *cm, yuv_t *image)
