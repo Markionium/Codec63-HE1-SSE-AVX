@@ -20,7 +20,7 @@ void put_byte(FILE *fp, int byte)
 
 void put_bytes(FILE *fp, const void* data, unsigned int len)
 {
-  size_t n = fwrite(data, 1, len, fp);
+  size_t n = fwrite(data, 1, (size_t) len, fp);
 
   if(n != (size_t) len)
   {
