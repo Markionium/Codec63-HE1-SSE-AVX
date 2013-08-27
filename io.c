@@ -9,12 +9,13 @@
 
 void put_byte(FILE *fp, int byte)
 {
-    int status = fputc(byte, fp);
+  int status = fputc(byte, fp);
 
-    if (status == EOF) {
-        fprintf(stderr, "Error writing byte\n");
-        exit(EXIT_FAILURE);
-    }
+  if (status == EOF)
+  {
+    fprintf(stderr, "Error writing byte\n");
+    exit(EXIT_FAILURE);
+  }
 }
 
 void put_bytes(FILE *fp, const void* data, unsigned int len)
