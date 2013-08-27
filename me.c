@@ -72,28 +72,30 @@ static void me_block_8x8(struct c63_common *cm, int mb_x, int mb_y,
 
 void c63_motion_estimate(struct c63_common *cm)
 {
-    /* Compare this frame with previous reconstructed frame */
+  /* Compare this frame with previous reconstructed frame */
+  int mb_x, mb_y;
 
-    int mb_x, mb_y;
-
-    /* Luma */
-    for (mb_y=0; mb_y < cm->mb_rows; ++mb_y)
+  /* Luma */
+  for (mb_y=0; mb_y < cm->mb_rows; ++mb_y)
+  {
+    for (mb_x=0; mb_x < cm->mb_cols; ++mb_x)
     {
-        for (mb_x=0; mb_x < cm->mb_cols; ++mb_x)
-        {
-            me_block_8x8(cm, mb_x, mb_y, cm->curframe->orig->Y, cm->refframe->recons->Y, 0);
-        }
+      me_block_8x8(cm, mb_x, mb_y, cm->curframe->orig->Y,
+          cm->refframe->recons->Y, 0);
     }
+  }
 
-    /* Chroma */
-    for (mb_y=0; mb_y < cm->mb_rows/2; ++mb_y)
+  /* Chroma */
+  for (mb_y=0; mb_y < cm->mb_rows/2; ++mb_y)
+  {
+    for (mb_x=0; mb_x < cm->mb_cols/2; ++mb_x)
     {
-        for (mb_x=0; mb_x < cm->mb_cols/2; ++mb_x)
-        {
-            me_block_8x8(cm, mb_x, mb_y, cm->curframe->orig->U, cm->refframe->recons->U, 1);
-            me_block_8x8(cm, mb_x, mb_y, cm->curframe->orig->V, cm->refframe->recons->V, 2);
-        }
+      me_block_8x8(cm, mb_x, mb_y, cm->curframe->orig->U,
+          cm->refframe->recons->U, 1);
+      me_block_8x8(cm, mb_x, mb_y, cm->curframe->orig->V,
+          cm->refframe->recons->V, 2);
     }
+  }
 }
 
 /* Motion compensation for 8x8 block */
