@@ -38,21 +38,20 @@ static void dct_1d(float *in_data, float *out_data)
 
 static void idct_1d(float *in_data, float *out_data)
 {
-    int i,j;
+  int i, j;
 
-    for (j=0; j<8; ++j)
+  for (i = 0; i < 8; ++i)
+  {
+    float idct = 0;
+
+    for (j = 0; j < 8; ++j)
     {
-        float idct = 0;
-
-        for (i=0; i<8; ++i)
-        {
-            idct += in_data[i] * dctlookup[j][i];
-        }
-
-        out_data[j] = idct;
+      idct += in_data[j] * dctlookup[i][j];
     }
-}
 
+    out_data[i] = idct;
+  }
+}
 
 static void scale_block(float *in_data, float *out_data)
 {
