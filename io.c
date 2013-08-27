@@ -20,9 +20,9 @@ void put_byte(FILE *fp, int byte)
 
 void put_bytes(FILE *fp, const void* data, unsigned int len)
 {
-  int n = fwrite(data, 1, len, fp);
+  size_t n = fwrite(data, 1, len, fp);
 
-  if(n != (int) len)
+  if(n != (size_t) len)
   {
     fprintf(stderr, "Error writing bytes\n");
     exit(EXIT_FAILURE);
