@@ -72,17 +72,18 @@ static void scale_block(float *in_data, float *out_data)
 
 static void quantize_block(float *in_data, float *out_data, uint8_t *quant_tbl)
 {
-    int zigzag;
-    for (zigzag=0; zigzag < 64; ++zigzag)
-    {
-        uint8_t u = zigzag_U[zigzag];
-        uint8_t v = zigzag_V[zigzag];
+  int zigzag;
 
-        float dct = in_data[v*8+u];
+  for (zigzag = 0; zigzag < 64; ++zigzag)
+  {
+    uint8_t u = zigzag_U[zigzag];
+    uint8_t v = zigzag_V[zigzag];
 
-        /* Zig-zag and quantize */
-        out_data[zigzag] = round((dct / 4.0) / quant_tbl[zigzag]);
-    }
+    float dct = in_data[v*8+u];
+
+    /* Zig-zag and quantize */
+    out_data[zigzag] = round((dct / 4.0) / quant_tbl[zigzag]);
+  }
 }
 
 static void dequantize_block(float *in_data, float *out_data, uint8_t *quant_tbl)
