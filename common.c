@@ -121,30 +121,30 @@ void destroy_frame(struct frame *f)
 
 struct frame* create_frame(struct c63_common *cm, yuv_t *image)
 {
-    struct frame *f = malloc(sizeof(struct frame));
+  struct frame *f = malloc(sizeof(struct frame));
 
-    f->orig = image;
+  f->orig = image;
 
-    f->recons = malloc(sizeof(yuv_t));
-    f->recons->Y = malloc(cm->ypw * cm->yph);
-    f->recons->U = malloc(cm->upw * cm->uph);
-    f->recons->V = malloc(cm->vpw * cm->vph);
+  f->recons = malloc(sizeof(yuv_t));
+  f->recons->Y = malloc(cm->ypw * cm->yph);
+  f->recons->U = malloc(cm->upw * cm->uph);
+  f->recons->V = malloc(cm->vpw * cm->vph);
 
-    f->predicted = malloc(sizeof(yuv_t));
-    f->predicted->Y = calloc(cm->ypw * cm->yph, sizeof(uint8_t));
-    f->predicted->U = calloc(cm->upw * cm->uph, sizeof(uint8_t));
-    f->predicted->V = calloc(cm->vpw * cm->vph, sizeof(uint8_t));
+  f->predicted = malloc(sizeof(yuv_t));
+  f->predicted->Y = calloc(cm->ypw * cm->yph, sizeof(uint8_t));
+  f->predicted->U = calloc(cm->upw * cm->uph, sizeof(uint8_t));
+  f->predicted->V = calloc(cm->vpw * cm->vph, sizeof(uint8_t));
 
-    f->residuals = malloc(sizeof(dct_t));
-    f->residuals->Ydct = calloc(cm->ypw * cm->yph, sizeof(int16_t));
-    f->residuals->Udct = calloc(cm->upw * cm->uph, sizeof(int16_t));
-    f->residuals->Vdct = calloc(cm->vpw * cm->vph, sizeof(int16_t));
+  f->residuals = malloc(sizeof(dct_t));
+  f->residuals->Ydct = calloc(cm->ypw * cm->yph, sizeof(int16_t));
+  f->residuals->Udct = calloc(cm->upw * cm->uph, sizeof(int16_t));
+  f->residuals->Vdct = calloc(cm->vpw * cm->vph, sizeof(int16_t));
 
-    f->mbs[0] = calloc(cm->mb_rows * cm->mb_cols, sizeof(struct macroblock));
-    f->mbs[1] = calloc(cm->mb_rows/2 * cm->mb_cols/2, sizeof(struct macroblock));
-    f->mbs[2] = calloc(cm->mb_rows/2 * cm->mb_cols/2, sizeof(struct macroblock));
+  f->mbs[0] = calloc(cm->mb_rows * cm->mb_cols, sizeof(struct macroblock));
+  f->mbs[1] = calloc(cm->mb_rows/2 * cm->mb_cols/2, sizeof(struct macroblock));
+  f->mbs[2] = calloc(cm->mb_rows/2 * cm->mb_cols/2, sizeof(struct macroblock));
 
-    return f;
+  return f;
 }
 
 void dump_image(yuv_t *image, int w, int h, FILE *fp)
