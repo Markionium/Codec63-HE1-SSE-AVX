@@ -103,34 +103,27 @@ static void dequantize_block(float *in_data, float *out_data,
   }
 }
 
-void dct_quant_block_8x8(int16_t *in_data, int16_t *out_data, uint8_t *quant_tbl)
+void dct_quant_block_8x8(int16_t *in_data, int16_t *out_data,
+    uint8_t *quant_tbl)
 {
-    float mb[8*8] __attribute((aligned(16)));
-    float mb2[8*8] __attribute((aligned(16)));
+  float mb[8*8] __attribute((aligned(16)));
+  float mb2[8*8] __attribute((aligned(16)));
 
-    int i, v;
+  int i, v;
 
-    for (i=0; i<64; ++i)
-        mb2[i] = in_data[i];
+  for (i = 0; i < 64; ++i) { mb2[i] = in_data[i]; }
 
-    for (v=0; v<8; ++v)
-    {
-        dct_1d(mb2+v*8, mb+v*8);
-    }
+  for (v = 0; v < 8; ++v) { dct_1d(mb2+v*8, mb+v*8); }
 
-    transpose_block(mb, mb2);
+  transpose_block(mb, mb2);
 
-    for (v=0; v<8; ++v)
-    {
-        dct_1d(mb2+v*8, mb+v*8);
-    }
+  for (v = 0; v < 8; ++v) { dct_1d(mb2+v*8, mb+v*8); }
 
-    transpose_block(mb, mb2);
-    scale_block(mb2, mb);
-    quantize_block(mb, mb2, quant_tbl);
+  transpose_block(mb, mb2);
+  scale_block(mb2, mb);
+  quantize_block(mb, mb2, quant_tbl);
 
-    for (i=0; i<64; ++i)
-        out_data[i] = mb2[i];
+  for (i = 0; i < 64; ++i) { out_data[i] = mb2[i]; }
 }
 
 
