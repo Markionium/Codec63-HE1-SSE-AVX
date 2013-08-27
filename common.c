@@ -10,33 +10,35 @@
 #include "c63.h"
 #include "tables.h"
 
-void dequantize_idct_row(int16_t *in_data, uint8_t *prediction, int w, int h, int y,
-			 uint8_t *out_data, uint8_t *quantization)
+void dequantize_idct_row(int16_t *in_data, uint8_t *prediction, int w, int h,
+    int y, uint8_t *out_data, uint8_t *quantization)
 {
-    int x;
+  int x;
 
-    int16_t block[8*8];
+  int16_t block[8*8];
 
-    /* Perform the dequantization and iDCT */
-    for(x = 0; x < w; x += 8)
+  /* Perform the dequantization and iDCT */
+  for(x = 0; x < w; x += 8)
+  {
+    int i,j;
+
+    dequant_idct_block_8x8(in_data+(x*8), block, quantization);
+
+    for (i = 0; i < 8; ++i)
     {
-        int i,j;
-        dequant_idct_block_8x8(in_data+(x*8), block, quantization);
+      for (j = 0; j < 8; ++j)
+      {
+        /* Add prediction block. Note: DCT is not precise -
+           Clamp to legal values */
+        int16_t tmp = block[i*8+j] + (int16_t)prediction[i*w+j+x];
 
+        if (tmp < 0) { tmp = 0; }
+        else if (tmp > 255) { tmp = 255; }
 
-        for (i=0; i<8; ++i)
-            for (j=0; j<8; ++j)
-            {
-                /* Add prediction block. Note: DCT is not precise - Clamp to legal values */
-                int16_t tmp = block[i*8+j] + (int16_t)prediction[i*w+j+x];
-                if (tmp < 0)
-                    tmp = 0;
-                else if (tmp > 255)
-                    tmp = 255;
-
-                out_data[i*w+j+x] = tmp;
-            }
+        out_data[i*w+j+x] = tmp;
+      }
     }
+  }
 }
 
 void dequantize_idct(int16_t *in_data, uint8_t *prediction, uint32_t width, uint32_t height,
