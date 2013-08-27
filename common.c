@@ -54,24 +54,30 @@ void dequantize_idct(int16_t *in_data, uint8_t *prediction, uint32_t width,
 }
 
 void dct_quantize_row(uint8_t *in_data, uint8_t *prediction, int w, int h,
-        int16_t *out_data, uint8_t *quantization)
+    int16_t *out_data, uint8_t *quantization)
 {
-    int x;
+  int x;
 
-    int16_t block[8*8];
+  int16_t block[8*8];
 
-    /* Perform the DCT and quantization */
-    for(x = 0; x < w; x += 8)
+  /* Perform the DCT and quantization */
+  for(x = 0; x < w; x += 8)
+  {
+    int i,j;
+
+    for (i = 0; i < 8; ++i)
     {
-        int i,j;
-        for (i=0; i<8; ++i)
-            for (j=0; j<8; ++j)
-                block[i*8+j] = ((int16_t)in_data[i*w+j+x] - prediction[i*w+j+x]);
-
-        /* Store MBs linear in memory, i.e. the 64 coefficients are stored continous.
-         * This allows us to ignore stride in DCT/iDCT and other functions. */
-        dct_quant_block_8x8(block, out_data+(x*8), quantization);
+      for (j=0; j<8; ++j)
+      {
+        block[i*8+j] = ((int16_t)in_data[i*w+j+x] - prediction[i*w+j+x]);
+      }
     }
+
+    /* Store MBs linear in memory, i.e. the 64 coefficients are stored
+       continous. This allows us to ignore stride in DCT/iDCT and other
+       functions. */
+    dct_quant_block_8x8(block, out_data+(x*8), quantization);
+  }
 }
 
 void dct_quantize(uint8_t *in_data, uint8_t *prediction,
