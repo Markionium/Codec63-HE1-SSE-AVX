@@ -82,7 +82,7 @@ static void quantize_block(float *in_data, float *out_data, uint8_t *quant_tbl)
     float dct = in_data[v*8+u];
 
     /* Zig-zag and quantize */
-    out_data[zigzag] = round((dct / 4.0) / quant_tbl[zigzag]);
+    out_data[zigzag] = (float) round((dct / 4.0) / quant_tbl[zigzag]);
   }
 }
 
@@ -99,7 +99,7 @@ static void dequantize_block(float *in_data, float *out_data,
     float dct = in_data[zigzag];
 
     /* Zig-zag and de-quantize */
-    out_data[v*8+u] = round((dct * quant_tbl[zigzag]) / 4.0);
+    out_data[v*8+u] = (float) round((dct * quant_tbl[zigzag]) / 4.0);
   }
 }
 
