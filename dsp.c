@@ -21,19 +21,19 @@ static void transpose_block(float *in_data, float *out_data)
 
 static void dct_1d(float *in_data, float *out_data)
 {
-    int i,j;
+  int i, j;
 
-    for (j=0; j<8; ++j)
+  for (i = 0; i < 8; ++i)
+  {
+    float dct = 0;
+
+    for (j = 0; j < 8; ++j)
     {
-        float dct = 0;
-
-        for (i=0; i<8; ++i)
-        {
-            dct += in_data[i] * dctlookup[i][j];
-        }
-
-        out_data[j] = dct;
+      dct += in_data[j] * dctlookup[j][i];
     }
+
+    out_data[i] = dct;
+  }
 }
 
 static void idct_1d(float *in_data, float *out_data)
