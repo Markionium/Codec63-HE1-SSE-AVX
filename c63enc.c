@@ -55,10 +55,19 @@ static yuv_t* read_yuv(FILE *file)
     exit(EXIT_FAILURE);
   }
 
-  if (len != width*height*1.5)
+  if (feof(file))
+  {
+    free(image->Y);
+    free(image->U);
+    free(image->V);
+    free(image);
+
+    return NULL;
+  }
+  else if (len != width*height*1.5)
   {
     fprintf(stderr, "Reached end of file, but incorrect bytes read.\n");
-    fprintf(stderr, "Wrong input? (height: %d width %d)\n", height, width);
+    fprintf(stderr, "Wrong input? (height: %d width: %d)\n", height, width);
 
     free(image->Y);
     free(image->U);
@@ -162,7 +171,7 @@ static void print_help()
   printf("Commandline options:\n");
   printf("  -h                             Height of images to compress\n");
   printf("  -w                             Width of images to compress\n");
-  printf("  -o                             Output file (.mjpg)\n");
+  printf("  -o                             Output file (.c63)\n");
   printf("  [-f]                           Limit number of frames to encode\n");
   printf("\n");
 
