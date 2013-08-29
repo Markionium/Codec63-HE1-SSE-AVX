@@ -17,21 +17,25 @@ int frequencies[2][12];
  e.g., like 0xD8 in the SOI marker below. Some markers have a payload, and if
  so, the size of the payload is written before the payload itself. */
 
+#define JPEG_DEF_MARKER 0xFF
+#define JPEG_SOI_MARKER 0xD8
+#define JPEG_DQT_MARKER 0xDB
+#define JPEG_SOF_MARKER 0xC0
+
 /* Start of Image (SOI) marker, contains no payload. */
 static void write_SOI(struct c63_common *cm)
 {
-  put_byte(cm->e_ctx.fp, 0xff);
-  put_byte(cm->e_ctx.fp, 0xd8);
+  put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER);
+  put_byte(cm->e_ctx.fp, JPEG_SOI_MARKER);
 }
 
-/* Define Quatization Tables (DQT) marker, the size of the tables and the tables
- themselves are written as payload. */
+/* Define Quatization Tables (DQT) marker, contains the tables as payload. */
 static void write_DQT(struct c63_common *cm)
 {
-  int16_t size = 2 + (3 * 65);
+  int16_t size = 2 + (3 * 64 + 1);
 
-  put_byte(cm->e_ctx.fp, 0xff);
-  put_byte(cm->e_ctx.fp, 0xdb);
+  put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER);
+  put_byte(cm->e_ctx.fp, JPEG_DQT_MARKER);
 
   put_byte(cm->e_ctx.fp, size >> 8);
   put_byte(cm->e_ctx.fp, size & 0xff);
@@ -46,13 +50,14 @@ static void write_DQT(struct c63_common *cm)
   put_bytes(cm->e_ctx.fp, cm->quanttbl[2], 64);
 }
 
+/* Start of Frame (SOF) marker with baseline DCT (aka SOF0). */
 static void write_SOF0(struct c63_common *cm)
 {
     int16_t size = 8 + 3 * COLOR_COMPONENTS + 1;
 
     /* Header marker */
-    put_byte(cm->e_ctx.fp, 0xff);
-    put_byte(cm->e_ctx.fp, 0xc0);
+    put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER);
+    put_byte(cm->e_ctx.fp, JPEG_SOF_MARKER);
 
     /* Size of header */
     put_byte(cm->e_ctx.fp, size >> 8);
