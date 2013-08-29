@@ -37,15 +37,19 @@ static void write_DQT(struct c63_common *cm)
   put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER);
   put_byte(cm->e_ctx.fp, JPEG_DQT_MARKER);
 
+  /* Size of total payload */
   put_byte(cm->e_ctx.fp, size >> 8);
   put_byte(cm->e_ctx.fp, size & 0xff);
 
+  /* Quatization table for Y component */
   put_byte(cm->e_ctx.fp, 0);
   put_bytes(cm->e_ctx.fp, cm->quanttbl[0], 64);
 
+  /* Quantization table for U component */
   put_byte(cm->e_ctx.fp, 1);
   put_bytes(cm->e_ctx.fp, cm->quanttbl[1], 64);
 
+  /* Quantization table for V component */
   put_byte(cm->e_ctx.fp, 2);
   put_bytes(cm->e_ctx.fp, cm->quanttbl[2], 64);
 }
@@ -53,41 +57,40 @@ static void write_DQT(struct c63_common *cm)
 /* Start of Frame (SOF) marker with baseline DCT (aka SOF0). */
 static void write_SOF0(struct c63_common *cm)
 {
-    int16_t size = 8 + 3 * COLOR_COMPONENTS + 1;
+  int16_t size = 8 + 3 * COLOR_COMPONENTS + 1;
 
-    /* Header marker */
-    put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER);
-    put_byte(cm->e_ctx.fp, JPEG_SOF_MARKER);
+  put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER);
+  put_byte(cm->e_ctx.fp, JPEG_SOF_MARKER);
 
-    /* Size of header */
-    put_byte(cm->e_ctx.fp, size >> 8);
-    put_byte(cm->e_ctx.fp, size & 0xff);
+  /* Size of total payload */
+  put_byte(cm->e_ctx.fp, size >> 8);
+  put_byte(cm->e_ctx.fp, size & 0xff);
 
-    /* Precision */
-    put_byte(cm->e_ctx.fp, 8);
+  /* Precision */
+  put_byte(cm->e_ctx.fp, 8);
 
-    /* Width and height */
-    put_byte(cm->e_ctx.fp, cm->height >> 8);
-    put_byte(cm->e_ctx.fp, cm->height & 0xff);
-    put_byte(cm->e_ctx.fp, cm->width >> 8);
-    put_byte(cm->e_ctx.fp, cm->width & 0xff);
+  /* Width and height */
+  put_byte(cm->e_ctx.fp, cm->height >> 8);
+  put_byte(cm->e_ctx.fp, cm->height & 0xff);
+  put_byte(cm->e_ctx.fp, cm->width >> 8);
+  put_byte(cm->e_ctx.fp, cm->width & 0xff);
 
-    put_byte(cm->e_ctx.fp, COLOR_COMPONENTS);
+  put_byte(cm->e_ctx.fp, COLOR_COMPONENTS);
 
-    put_byte(cm->e_ctx.fp, 1); /* Component id */
-    put_byte(cm->e_ctx.fp, 0x22); /* hor | ver sampling factor FIXME Y(2,2), U(1,1), V(1,1) */
-    put_byte(cm->e_ctx.fp, 0); /* Quant. tbl. id */
+  put_byte(cm->e_ctx.fp, 1); /* Component id */
+  put_byte(cm->e_ctx.fp, 0x22); /* hor | ver sampling factor */
+  put_byte(cm->e_ctx.fp, 0); /* Quant. tbl. id */
 
-    put_byte(cm->e_ctx.fp, 2); /* Component id */
-    put_byte(cm->e_ctx.fp, 0x11); /* hor | ver sampling factor */
-    put_byte(cm->e_ctx.fp, 1); /* Quant. tbl. id */
+  put_byte(cm->e_ctx.fp, 2); /* Component id */
+  put_byte(cm->e_ctx.fp, 0x11); /* hor | ver sampling factor */
+  put_byte(cm->e_ctx.fp, 1); /* Quant. tbl. id */
 
-    put_byte(cm->e_ctx.fp, 3); /* Component id */
-    put_byte(cm->e_ctx.fp, 0x11); /* hor | ver sampling factor */
-    put_byte(cm->e_ctx.fp, 2); /* Quant. tbl. id */
+  put_byte(cm->e_ctx.fp, 3); /* Component id */
+  put_byte(cm->e_ctx.fp, 0x11); /* hor | ver sampling factor */
+  put_byte(cm->e_ctx.fp, 2); /* Quant. tbl. id */
 
-    /* Is this a keyframe or not? */
-    put_byte(cm->e_ctx.fp, cm->curframe->keyframe);
+  /* Is this a keyframe or not? */
+  put_byte(cm->e_ctx.fp, cm->curframe->keyframe);
 }
 
 static void write_DHT_HTS(struct c63_common *cm, uint8_t id, uint8_t *numlength,
