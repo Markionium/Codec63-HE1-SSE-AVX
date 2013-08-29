@@ -12,16 +12,20 @@
 
 int frequencies[2][12];
 
-/* The JPEG format defines several segments and each segment is defined by a
- * marker. Markers always start with 0xFF, e.g., like the SOI marker below. */
+/* The JPEG file format defines several parts and each part is defined by a
+ marker, which always starts with 0xFF and then is followed by a magic number,
+ e.g., like 0xD8 in the SOI marker below. Some markers have a payload, and if
+ so, the size of the payload is written before the payload itself. */
 
-/* Start of image marker, contains no payload */
+/* Start of Image (SOI) marker, contains no payload. */
 static void write_SOI(struct c63_common *cm)
 {
   put_byte(cm->e_ctx.fp, 0xff);
   put_byte(cm->e_ctx.fp, 0xd8);
 }
 
+/* Define Quatization Tables (DQT) marker, the size of the tables and the tables
+ themselves are written as payload. */
 static void write_DQT(struct c63_common *cm)
 {
   int16_t size = 2 + (3 * 65);
