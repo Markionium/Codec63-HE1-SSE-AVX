@@ -247,7 +247,7 @@ int main(int argc, char **argv)
   /* Encode input frames */
   int numframes = 0;
 
-  while (!feof(infile))
+  while (1)
   {
     image = read_yuv(infile);
 
