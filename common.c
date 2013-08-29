@@ -20,7 +20,7 @@ void dequantize_idct_row(int16_t *in_data, uint8_t *prediction, int w, int h,
   /* Perform the dequantization and iDCT */
   for(x = 0; x < w; x += 8)
   {
-    int i,j;
+    int i, j;
 
     dequant_idct_block_8x8(in_data+(x*8), block, quantization);
 
@@ -63,11 +63,11 @@ void dct_quantize_row(uint8_t *in_data, uint8_t *prediction, int w, int h,
   /* Perform the DCT and quantization */
   for(x = 0; x < w; x += 8)
   {
-    int i,j;
+    int i, j;
 
     for (i = 0; i < 8; ++i)
     {
-      for (j=0; j<8; ++j)
+      for (j = 0; j < 8; ++j)
       {
         block[i*8+j] = ((int16_t)in_data[i*w+j+x] - prediction[i*w+j+x]);
       }
