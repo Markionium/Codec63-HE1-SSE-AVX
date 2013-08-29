@@ -12,6 +12,10 @@
 
 int frequencies[2][12];
 
+/* The JPEG format defines several segments and each segment is defined by a
+ * marker. Markers always start with 0xFF, e.g., like the SOI marker below. */
+
+/* Start of image marker, contains no payload */
 static void write_SOI(struct c63_common *cm)
 {
   put_byte(cm->e_ctx.fp, 0xff);
