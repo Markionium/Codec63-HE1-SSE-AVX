@@ -21,6 +21,9 @@ int frequencies[2][12];
 #define JPEG_SOI_MARKER 0xD8
 #define JPEG_DQT_MARKER 0xDB
 #define JPEG_SOF_MARKER 0xC0
+#define JPEG_DHT_MARKER 0xC4
+#define JPEG_SOS_MARKER 0xDA
+#define JPEG_EOI_MARKER 0xD9
 
 /* Start of Image (SOI) marker, contains no payload. */
 static void write_SOI(struct c63_common *cm)
@@ -37,7 +40,7 @@ static void write_DQT(struct c63_common *cm)
   put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER);
   put_byte(cm->e_ctx.fp, JPEG_DQT_MARKER);
 
-  /* Size of total payload */
+  /* Length of segment */
   put_byte(cm->e_ctx.fp, size >> 8);
   put_byte(cm->e_ctx.fp, size & 0xff);
 
@@ -62,7 +65,7 @@ static void write_SOF0(struct c63_common *cm)
   put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER);
   put_byte(cm->e_ctx.fp, JPEG_SOF_MARKER);
 
-  /* Size of total payload */
+  /* Lenght of segment */
   put_byte(cm->e_ctx.fp, size >> 8);
   put_byte(cm->e_ctx.fp, size & 0xff);
 
@@ -106,13 +109,14 @@ static void write_DHT_HTS(struct c63_common *cm, uint8_t id, uint8_t *numlength,
   put_bytes(cm->e_ctx.fp, data, n);
 }
 
+/* Define Huffman Table (DHT) marker, the payload is the Huffman table
+   specifiation. */
 static void write_DHT(struct c63_common *cm)
 {
   int16_t size = 0x01A2; /* 2 + n*(17+mi); */
 
-  /* Define Huffman Table marker */
-  put_byte(cm->e_ctx.fp, 0xff);
-  put_byte(cm->e_ctx.fp, 0xc4);
+  put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER);
+  put_byte(cm->e_ctx.fp, JPEG_DHT_MARKER);
 
   /* Length of segment */
   put_byte(cm->e_ctx.fp, size >> 8);
@@ -129,13 +133,16 @@ static void write_DHT(struct c63_common *cm)
   write_DHT_HTS(cm, 0x11, ACVLC_num_by_length[1], ACVLC_data[1]);
 }
 
+/* Start of Scan (SOS) marker, the payload is references to the huffman
+ tables. It is followed by the image data, see write_frame(). */
 static void write_SOS(struct c63_common *cm)
 {
   int16_t size = 6 + 2 * COLOR_COMPONENTS;
 
-  put_byte(cm->e_ctx.fp, 0xff);
-  put_byte(cm->e_ctx.fp, 0xda);
+  put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER)
+  put_byte(cm->e_ctx.fp, JPEG_SOS_MARKER);
 
+  /* Length of the segment */
   put_byte(cm->e_ctx.fp, size >> 8);
   put_byte(cm->e_ctx.fp, size & 0xff);
 
@@ -147,15 +154,17 @@ static void write_SOS(struct c63_common *cm)
   put_byte(cm->e_ctx.fp, 0x11); /* DC | AC huff tbl */
   put_byte(cm->e_ctx.fp, 3); /* Component id */
   put_byte(cm->e_ctx.fp, 0x11); /* DC | AC huff tbl */
+
   put_byte(cm->e_ctx.fp, 0); /* ss, first AC */
   put_byte(cm->e_ctx.fp, 63); /* se, last AC */
   put_byte(cm->e_ctx.fp, 0); /* ah | al */
 }
 
+/* End of Image (EOI) marker, contains no payload. */
 static void write_EOI(struct c63_common *cm)
 {
-  put_byte(cm->e_ctx.fp, 0xff);
-  put_byte(cm->e_ctx.fp, 0xd9);
+  put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER);
+  put_byte(cm->e_ctx.fp, JPEG_EOI_MARKER);
 }
 
 static inline uint8_t bit_width(int16_t i)
