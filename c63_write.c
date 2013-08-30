@@ -139,7 +139,7 @@ static void write_SOS(struct c63_common *cm)
 {
   int16_t size = 6 + 2 * COLOR_COMPONENTS;
 
-  put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER)
+  put_byte(cm->e_ctx.fp, JPEG_DEF_MARKER);
   put_byte(cm->e_ctx.fp, JPEG_SOS_MARKER);
 
   /* Length of the segment */
