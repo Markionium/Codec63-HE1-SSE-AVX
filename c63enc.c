@@ -19,13 +19,6 @@ static int limit_numframes = 0;
 static uint32_t width;
 static uint32_t height;
 
-static uint32_t yph;
-static uint32_t ypw;
-static uint32_t uph;
-static uint32_t upw;
-static uint32_t vph;
-static uint32_t vpw;
-
 /* getopt */
 extern int optind;
 extern char *optarg;
@@ -223,14 +216,6 @@ int main(int argc, char **argv)
 
   struct c63_common *cm = init_c63_enc(width, height);
   cm->e_ctx.fp = outfile;
-
-  /* Calculate the padded width and height */
-  ypw = (uint32_t)(ceil(width/8.0f)*8);
-  yph = (uint32_t)(ceil(height/8.0f)*8);
-  upw = (uint32_t)(ceil(width*UX/(YX*8.0f))*8);
-  uph = (uint32_t)(ceil(height*UY/(YY*8.0f))*8);
-  vpw = (uint32_t)(ceil(width*VX/(YX*8.0f))*8);
-  vph = (uint32_t)(ceil(height*VY/(YY*8.0f))*8);
 
   input_file = argv[optind];
 
