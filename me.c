@@ -21,10 +21,10 @@ static void me_block_8x8(struct c63_common *cm, int mb_x, int mb_y,
   /* Half resolution for chroma channels. */
   if (cc > 0) { range /= 2; }
 
-  int left = mb_x*8 - range;
-  int top = mb_y*8 - range;
-  int right = mb_x*8 + range;
-  int bottom = mb_y*8 + range;
+  int left = mb_x * 8 - range;
+  int top = mb_y * 8 - range;
+  int right = mb_x * 8 + range;
+  int bottom = mb_y * 8 + range;
 
   int w = cm->padw[cc];
   int h = cm->padh[cc];
@@ -76,9 +76,9 @@ void c63_motion_estimate(struct c63_common *cm)
   int mb_x, mb_y;
 
   /* Luma */
-  for (mb_y=0; mb_y < cm->mb_rows; ++mb_y)
+  for (mb_y = 0; mb_y < cm->mb_rows; ++mb_y)
   {
-    for (mb_x=0; mb_x < cm->mb_cols; ++mb_x)
+    for (mb_x = 0; mb_x < cm->mb_cols; ++mb_x)
     {
       me_block_8x8(cm, mb_x, mb_y, cm->curframe->orig->Y,
           cm->refframe->recons->Y, 0);
@@ -86,9 +86,9 @@ void c63_motion_estimate(struct c63_common *cm)
   }
 
   /* Chroma */
-  for (mb_y=0; mb_y < cm->mb_rows/2; ++mb_y)
+  for (mb_y = 0; mb_y < cm->mb_rows / 2; ++mb_y)
   {
-    for (mb_x=0; mb_x < cm->mb_cols/2; ++mb_x)
+    for (mb_x = 0; mb_x < cm->mb_cols / 2; ++mb_x)
     {
       me_block_8x8(cm, mb_x, mb_y, cm->curframe->orig->U,
           cm->refframe->recons->U, 1);
@@ -106,8 +106,8 @@ static void mc_block_8x8(struct c63_common *cm, int mb_x, int mb_y,
 
   if (!mb->use_mv) { return; }
 
-  int left = mb_x*8;
-  int top = mb_y*8;
+  int left = mb_x * 8;
+  int top = mb_y * 8;
   int right = left + 8;
   int bottom = top + 8;
 
