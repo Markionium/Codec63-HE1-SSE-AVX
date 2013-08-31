@@ -113,13 +113,12 @@ void dct_quant_block_8x8(int16_t *in_data, int16_t *out_data,
 
   for (i = 0; i < 64; ++i) { mb2[i] = in_data[i]; }
 
+  /* Two 1D DCT operations with transpose */
   for (v = 0; v < 8; ++v) { dct_1d(mb2+v*8, mb+v*8); }
-
+  transpose_block(mb, mb2);
+  for (v = 0; v < 8; ++v) { dct_1d(mb2+v*8, mb+v*8); }
   transpose_block(mb, mb2);
 
-  for (v = 0; v < 8; ++v) { dct_1d(mb2+v*8, mb+v*8); }
-
-  transpose_block(mb, mb2);
   scale_block(mb2, mb);
   quantize_block(mb, mb2, quant_tbl);
 
@@ -139,12 +138,10 @@ void dequant_idct_block_8x8(int16_t *in_data, int16_t *out_data,
   dequantize_block(mb, mb2, quant_tbl);
   scale_block(mb2, mb);
 
+  /* Two 1D inverse DCT operations with transpose */
   for (v = 0; v < 8; ++v) { idct_1d(mb+v*8, mb2+v*8); }
-
   transpose_block(mb2, mb);
-
   for (v = 0; v < 8; ++v) { idct_1d(mb+v*8, mb2+v*8); }
-
   transpose_block(mb2, mb);
 
   for (i = 0; i < 64; ++i) { out_data[i] = mb[i]; }
