@@ -29,8 +29,8 @@ static void me_block_8x8(struct c63_common *cm, int mb_x, int mb_y,
   int w = cm->padw[cc];
   int h = cm->padh[cc];
 
-  /* Make sure we are within bounds of reference frame */
-  // TODO: Support partial frame bounds
+  /* Make sure we are within bounds of reference frame. TODO: Support partial
+     frame bounds. */
   if (left < 0) { left = 0; }
   if (top < 0) { top = 0; }
   if (right > (w - 8)) { right = w - 8; }
