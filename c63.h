@@ -43,56 +43,53 @@ typedef struct dct dct_t;
 
 struct entropy_ctx
 {
-    FILE *fp;
-    unsigned int bit_buffer;
-    unsigned int bit_buffer_width;
+  FILE *fp;
+  unsigned int bit_buffer;
+  unsigned int bit_buffer_width;
 };
 
 struct macroblock
 {
-    int use_mv;
-    int8_t mv_x, mv_y;
+  int use_mv;
+  int8_t mv_x, mv_y;
 };
 
 struct frame
 {
-    yuv_t *orig;        // Original input image
-    yuv_t *recons;      // Reconstructed image
-    yuv_t *predicted;   // Predicted frame from intra-prediction
+  yuv_t *orig;        // Original input image
+  yuv_t *recons;      // Reconstructed image
+  yuv_t *predicted;   // Predicted frame from intra-prediction
 
-    dct_t *residuals;   // Difference between original image and predicted frame
+  dct_t *residuals;   // Difference between original image and predicted frame
 
-    // Meh
-
-    struct macroblock *mbs[3];
-
-    int keyframe;
+  struct macroblock *mbs[3];
+  int keyframe;
 };
 
 struct c63_common
 {
-    int width, height;
-    int ypw, yph, upw, uph, vpw, vph;
+  int width, height;
+  int ypw, yph, upw, uph, vpw, vph;
 
-    int padw[3], padh[3];
+  int padw[3], padh[3];
 
-    int mb_cols, mb_rows;
+  int mb_cols, mb_rows;
 
-    uint8_t qp;                         // Quality parameter
+  uint8_t qp;                         // Quality parameter
 
-    int me_search_range;
+  int me_search_range;
 
-    uint8_t quanttbl[3][64];
+  uint8_t quanttbl[3][64];
 
-    struct frame *refframe;
-    struct frame *curframe;
+  struct frame *refframe;
+  struct frame *curframe;
 
-    int framenum;
+  int framenum;
 
-    int keyframe_interval;
-    int frames_since_keyframe;
+  int keyframe_interval;
+  int frames_since_keyframe;
 
-    struct entropy_ctx e_ctx;
+  struct entropy_ctx e_ctx;
 };
 
 /* Definitions are found in 'io.c' */
