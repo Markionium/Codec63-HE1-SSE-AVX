@@ -130,9 +130,9 @@ void c63_motion_compensate(struct c63_common *cm)
   int mb_x, mb_y;
 
   /* Luma */
-  for (mb_y=0; mb_y < cm->mb_rows; ++mb_y)
+  for (mb_y = 0; mb_y < cm->mb_rows; ++mb_y)
   {
-    for (mb_x=0; mb_x < cm->mb_cols; ++mb_x)
+    for (mb_x = 0; mb_x < cm->mb_cols; ++mb_x)
     {
       mc_block_8x8(cm, mb_x, mb_y, cm->curframe->predicted->Y,
           cm->refframe->recons->Y, 0);
@@ -140,9 +140,9 @@ void c63_motion_compensate(struct c63_common *cm)
   }
 
   /* Chroma */
-  for (mb_y=0; mb_y < cm->mb_rows/2; ++mb_y)
+  for (mb_y = 0; mb_y < cm->mb_rows / 2; ++mb_y)
   {
-    for (mb_x=0; mb_x < cm->mb_cols/2; ++mb_x)
+    for (mb_x = 0; mb_x < cm->mb_cols / 2; ++mb_x)
     {
       mc_block_8x8(cm, mb_x, mb_y, cm->curframe->predicted->U,
           cm->refframe->recons->U, 1);
