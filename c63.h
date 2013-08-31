@@ -29,10 +29,6 @@ struct yuv
   uint8_t *Y;
   uint8_t *U;
   uint8_t *V;
-
-  uint8_t *Ybase;
-  uint8_t *Ubase;
-  uint8_t *Vbase;
 };
 
 struct dct
