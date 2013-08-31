@@ -102,7 +102,7 @@ static void write_DHT_HTS(struct c63_common *cm, uint8_t id, uint8_t *numlength,
   /* Find out how many codes we are to write */
   int i, n = 0;
 
-  for(i = 0; i < 16; ++i) { n += numlength[i]; }
+  for (i = 0; i < 16; ++i) { n += numlength[i]; }
 
   put_byte(cm->e_ctx.fp, id);
   put_bytes(cm->e_ctx.fp, numlength, 16);
