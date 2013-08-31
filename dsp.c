@@ -152,7 +152,7 @@ void dequant_idct_block_8x8(int16_t *in_data, int16_t *out_data,
 
 void sad_block_8x8(uint8_t *block1, uint8_t *block2, int stride, int *result)
 {
-  int u,v;
+  int u, v;
 
   *result = 0;
 
