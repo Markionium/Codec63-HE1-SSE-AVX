@@ -115,7 +115,8 @@ static void c63_encode_image(struct c63_common *cm, yuv_t *image)
   dequantize_idct(cm->curframe->residuals->Vdct, cm->curframe->predicted->V,
       cm->vpw, cm->vph, cm->curframe->recons->V, cm->quanttbl[2]);
 
-  /* dump_image can be used here to check if the prediction is correct */
+  /* Function dump_image(), found in common.c, can be used here to check if the
+     prediction is correct */
 
   write_frame(cm);
 
