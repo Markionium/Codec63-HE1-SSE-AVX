@@ -127,6 +127,7 @@ static void c63_encode_image(struct c63_common *cm, yuv_t *image)
 struct c63_common* init_c63_enc(int width, int height)
 {
   int i;
+
   /* calloc() sets allocated memory to zero */
   struct c63_common *cm = calloc(1, sizeof(struct c63_common));
 
@@ -224,7 +225,7 @@ int main(int argc, char **argv)
 
   FILE *infile = fopen(input_file, "rb");
 
-  if(infile == NULL)
+  if (infile == NULL)
   {
     perror("fopen");
     exit(EXIT_FAILURE);
