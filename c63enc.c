@@ -24,22 +24,23 @@ extern int optind;
 extern char *optarg;
 
 /* Read planar YUV frames with 4:2:0 chroma sub-sampling */
-static yuv_t* read_yuv(FILE *file)
+static yuv_t* read_yuv(FILE *file, struct c63_common *cm)
 {
   size_t len = 0;
   yuv_t *image = malloc(sizeof(*image));
 
-  /* Read Y. The size of Y is the same as the size of the image. */
-  image->Y = malloc(width*height);
+  /* Read Y. The size of Y is the same as the size of the image. The indices
+     represents the color component (0 is Y, 1 is U, and 2 is V) */
+  image->Y = calloc(1, cm->padw[0]*cm->padh[0]);
   len += fread(image->Y, 1, width*height, file);
 
   /* Read U. Given 4:2:0 chroma sub-sampling, the size is 1/4 of Y
      because (height/2)*(width/2) = (height*width)/4. */
-  image->U = malloc((width*height)/4);
+  image->U = calloc(1, cm->padw[1]*cm->padh[1]);
   len += fread(image->U, 1, (width*height)/4, file);
 
   /* Read V. Given 4:2:0 chroma sub-sampling, the size is 1/4 of Y. */
-  image->V = malloc((width*height)/4);
+  image->V = calloc(1, cm->padw[2]*cm->padh[2]);
   len += fread(image->V, 1, (width*height)/4, file);
 
   if (ferror(file))
@@ -236,7 +237,7 @@ int main(int argc, char **argv)
 
   while (1)
   {
-    image = read_yuv(infile);
+    image = read_yuv(infile, cm);
 
     if (!image) { break; }
 
