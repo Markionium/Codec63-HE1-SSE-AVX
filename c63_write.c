@@ -8,22 +8,11 @@
 #include <string.h>
 
 #include "c63.h"
+#include "c63_write.h"
+#include "io.h"
 #include "tables.h"
 
 int frequencies[2][12];
-
-/* The JPEG file format defines several parts and each part is defined by a
- marker, which always starts with 0xFF and then is followed by a magic number,
- e.g., like 0xD8 in the SOI marker below. Some markers have a payload, and if
- so, the size of the payload is written before the payload itself. */
-
-#define JPEG_DEF_MARKER 0xFF
-#define JPEG_SOI_MARKER 0xD8
-#define JPEG_DQT_MARKER 0xDB
-#define JPEG_SOF_MARKER 0xC0
-#define JPEG_DHT_MARKER 0xC4
-#define JPEG_SOS_MARKER 0xDA
-#define JPEG_EOI_MARKER 0xD9
 
 /* Start of Image (SOI) marker, contains no payload. */
 static void write_SOI(struct c63_common *cm)
