@@ -2,9 +2,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "dsp.h"
 #include "tables.h"
-
-#define ISQRT2 0.70710678118654f
 
 static void transpose_block(float *in_data, float *out_data)
 {
