@@ -8,18 +8,11 @@
 #include <string.h>
 
 #include "c63.h"
+#include "c63_write.h"
+#include "common.h"
+#include "io.h"
+#include "me.h"
 #include "tables.h"
-
-#define MARKER_START 0xff
-#define MARKER_DQT 0xdb
-#define MARKER_SOI 0xd8
-#define MARKER_SOS 0xda
-#define MARKER_SOF0 0xc0
-#define MARKER_EOI 0xd9
-#define MARKER_DHT 0xc4
-
-#define HUFF_AC_ZERO 16
-#define HUFF_AC_SIZE 11
 
 /* Decode VLC token */
 static uint8_t get_vlc_token(struct entropy_ctx *c, uint16_t *table,
@@ -358,8 +351,8 @@ void parse_dht(struct c63_common *cm)
 int parse_c63_frame(struct c63_common *cm)
 {
   // SOI
-  if (get_byte(cm->e_ctx.fp) != MARKER_START ||
-      get_byte(cm->e_ctx.fp) != MARKER_SOI)
+  if (get_byte(cm->e_ctx.fp) != JPEG_DEF_MARKER ||
+      get_byte(cm->e_ctx.fp) != JPEG_SOI_MARKER)
   {
     fprintf(stderr, "Not an JPEG file\n");
     exit(EXIT_FAILURE);
@@ -372,7 +365,7 @@ int parse_c63_frame(struct c63_common *cm)
 
     if (c == 0) { c = get_byte(cm->e_ctx.fp); }
 
-    if (c != MARKER_START)
+    if (c != JPEG_DEF_MARKER)
     {
       fprintf(stderr, "Expected marker.\n");
       exit(EXIT_FAILURE);
@@ -380,25 +373,25 @@ int parse_c63_frame(struct c63_common *cm)
 
     uint8_t marker = get_byte(cm->e_ctx.fp);
 
-    if (marker == MARKER_DQT)
+    if (marker == JPEG_DQT_MARKER)
     {
       parse_dqt(cm);
     }
-    else if (marker == MARKER_SOS)
+    else if (marker == JPEG_SOS_MARKER)
     {
       parse_sos(cm);
       read_interleaved_data(cm);
       cm->e_ctx.bit_buffer = cm->e_ctx.bit_buffer_width = 0;
     }
-    else if (marker == MARKER_SOF0)
+    else if (marker == JPEG_SOF_MARKER)
     {
       parse_sof0(cm);
     }
-    else if (marker == MARKER_DHT)
+    else if (marker == JPEG_DHT_MARKER)
     {
       parse_dht(cm);
     }
-    else if (marker == MARKER_EOI)
+    else if (marker == JPEG_EOI_MARKER)
     {
       return 1;
     }
