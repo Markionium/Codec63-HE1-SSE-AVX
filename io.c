@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "c63.h"
+#include "io.h"
 
 // XXX: Should be moved to a struct with FILE*
 
