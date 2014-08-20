@@ -9,6 +9,9 @@
 #include <string.h>
 
 #include "c63.h"
+#include "c63_write.h"
+#include "common.h"
+#include "me.h"
 #include "tables.h"
 
 static char *output_file, *input_file;
