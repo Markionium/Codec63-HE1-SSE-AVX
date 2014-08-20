@@ -1,8 +1,8 @@
-#include "c63.h"
+/* NOTE! The huffman tables are not adjusted for the frequencies that are
+   common when using inter-prediction. This results in a much larger file size
+   than what is to be expected compared to MJPEG. */
 
-/* NOTE! The huffman tables are not adjusted for the frequencies that are common
-   when using inter-prediction. This results in a much larger file size than
-   what is to be expected compared to MJPEG. */
+#include <inttypes.h>
 
 uint8_t yquanttbl_def[64] __attribute__((aligned(16))) =
 {
