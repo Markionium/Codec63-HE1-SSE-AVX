@@ -1,5 +1,5 @@
-#ifndef CPU_MJPEG_H
-#define CPU_MJPEG_H
+#ifndef C63_C63_H_
+#define C63_C63_H_
 
 #include <inttypes.h>
 #include <stdint.h>
@@ -20,6 +20,22 @@
 #define UY 1
 #define VX 1
 #define VY 1
+
+/* The JPEG file format defines several parts and each part is defined by a
+ marker. A file always starts with 0xFF and is then followed by a magic number,
+ e.g., like 0xD8 in the SOI marker below. Some markers have a payload, and if
+ so, the size of the payload is written before the payload itself. */
+
+#define JPEG_DEF_MARKER 0xFF
+#define JPEG_SOI_MARKER 0xD8
+#define JPEG_DQT_MARKER 0xDB
+#define JPEG_SOF_MARKER 0xC0
+#define JPEG_DHT_MARKER 0xC4
+#define JPEG_SOS_MARKER 0xDA
+#define JPEG_EOI_MARKER 0xD9
+
+#define HUFF_AC_ZERO 16
+#define HUFF_AC_SIZE 11
 
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
@@ -92,36 +108,4 @@ struct c63_common
   struct entropy_ctx e_ctx;
 };
 
-/* Definitions are found in 'io.c' */
-int read_bytes(FILE *fp, void *data, unsigned int sz);
-uint16_t get_bits(struct entropy_ctx *c, uint8_t n);
-uint8_t get_byte(FILE *fp);
-void flush_bits(struct entropy_ctx *c);
-void put_bits(struct entropy_ctx *c, uint16_t bits, uint8_t n);
-void put_byte(FILE *fp, int byte);
-void put_bytes(FILE *fp, const void* data, unsigned int len);
-
-/* Definitions are found in 'dsp.c' */
-void dct_quant_block_8x8(int16_t *in_data, int16_t *out_data,
-    uint8_t *quant_tbl);
-void dequant_idct_block_8x8(int16_t *in_data, int16_t *out_data,
-    uint8_t *quant_tbl);
-void sad_block_8x8(uint8_t *block1, uint8_t *block2, int stride, int *result);
-
-/* Definition found in 'c63_write.c' */
-void write_frame(struct c63_common *cm);
-
-/* Definitions are found in 'common.c' */
-struct frame* create_frame(struct c63_common *cm, yuv_t *image);
-void dct_quantize(uint8_t *in_data, uint8_t *prediction, uint32_t width,
-    uint32_t height, int16_t *out_data, uint8_t *quantization);
-void dequantize_idct(int16_t *in_data, uint8_t *prediction, uint32_t width,
-    uint32_t height, uint8_t *out_data, uint8_t *quantization);
-void destroy_frame(struct frame *f);
-void dump_image(yuv_t *image, int w, int h, FILE *fp);
-
-/* Definitions are found in 'me.c' */
-void c63_motion_estimate(struct c63_common *cm);
-void c63_motion_compensate(struct c63_common *cm);
-
-#endif /* CPU_MJPEG_H */
+#endif  /* C63_C63_H_ */
