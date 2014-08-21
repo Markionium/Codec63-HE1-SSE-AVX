@@ -34,16 +34,16 @@ static void write_DQT(struct c63_common *cm)
   put_byte(cm->e_ctx.fp, size & 0xff);
 
   /* Quatization table for Y component */
-  put_byte(cm->e_ctx.fp, 0);
-  put_bytes(cm->e_ctx.fp, cm->quanttbl[0], 64);
+  put_byte(cm->e_ctx.fp, Y_COMPONENT);
+  put_bytes(cm->e_ctx.fp, cm->quanttbl[Y_COMPONENT], 64);
 
   /* Quantization table for U component */
-  put_byte(cm->e_ctx.fp, 1);
-  put_bytes(cm->e_ctx.fp, cm->quanttbl[1], 64);
+  put_byte(cm->e_ctx.fp, U_COMPONENT);
+  put_bytes(cm->e_ctx.fp, cm->quanttbl[U_COMPONENT], 64);
 
   /* Quantization table for V component */
-  put_byte(cm->e_ctx.fp, 2);
-  put_bytes(cm->e_ctx.fp, cm->quanttbl[2], 64);
+  put_byte(cm->e_ctx.fp, V_COMPONENT);
+  put_bytes(cm->e_ctx.fp, cm->quanttbl[V_COMPONENT], 64);
 }
 
 /* Start of Frame (SOF) marker with baseline DCT (aka SOF0). */

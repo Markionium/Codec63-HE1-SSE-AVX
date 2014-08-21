@@ -82,7 +82,7 @@ void c63_motion_estimate(struct c63_common *cm)
     for (mb_x = 0; mb_x < cm->mb_cols; ++mb_x)
     {
       me_block_8x8(cm, mb_x, mb_y, cm->curframe->orig->Y,
-          cm->refframe->recons->Y, 0);
+          cm->refframe->recons->Y, Y_COMPONENT);
     }
   }
 
@@ -136,7 +136,7 @@ void c63_motion_compensate(struct c63_common *cm)
     for (mb_x = 0; mb_x < cm->mb_cols; ++mb_x)
     {
       mc_block_8x8(cm, mb_x, mb_y, cm->curframe->predicted->Y,
-          cm->refframe->recons->Y, 0);
+          cm->refframe->recons->Y, Y_COMPONENT);
     }
   }
 
@@ -146,9 +146,9 @@ void c63_motion_compensate(struct c63_common *cm)
     for (mb_x = 0; mb_x < cm->mb_cols / 2; ++mb_x)
     {
       mc_block_8x8(cm, mb_x, mb_y, cm->curframe->predicted->U,
-          cm->refframe->recons->U, 1);
+          cm->refframe->recons->U, U_COMPONENT);
       mc_block_8x8(cm, mb_x, mb_y, cm->curframe->predicted->V,
-          cm->refframe->recons->V, 2);
+          cm->refframe->recons->V, V_COMPONENT);
     }
   }
 }

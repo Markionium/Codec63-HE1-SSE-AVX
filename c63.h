@@ -14,6 +14,10 @@
 
 #define COLOR_COMPONENTS 3
 
+#define Y_COMPONENT 0
+#define U_COMPONENT 1
+#define V_COMPONENT 2
+
 #define YX 2
 #define YY 2
 #define UX 1
@@ -78,7 +82,7 @@ struct frame
 
   dct_t *residuals;   // Difference between original image and predicted frame
 
-  struct macroblock *mbs[3];
+  struct macroblock *mbs[COLOR_COMPONENTS];
   int keyframe;
 };
 
@@ -87,7 +91,7 @@ struct c63_common
   int width, height;
   int ypw, yph, upw, uph, vpw, vph;
 
-  int padw[3], padh[3];
+  int padw[COLOR_COMPONENTS], padh[COLOR_COMPONENTS];
 
   int mb_cols, mb_rows;
 
@@ -95,7 +99,7 @@ struct c63_common
 
   int me_search_range;
 
-  uint8_t quanttbl[3][64];
+  uint8_t quanttbl[COLOR_COMPONENTS][64];
 
   struct frame *refframe;
   struct frame *curframe;

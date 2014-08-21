@@ -34,16 +34,16 @@ static yuv_t* read_yuv(FILE *file, struct c63_common *cm)
 
   /* Read Y. The size of Y is the same as the size of the image. The indices
      represents the color component (0 is Y, 1 is U, and 2 is V) */
-  image->Y = calloc(1, cm->padw[0]*cm->padh[0]);
+  image->Y = calloc(1, cm->padw[Y_COMPONENT]*cm->padh[Y_COMPONENT]);
   len += fread(image->Y, 1, width*height, file);
 
   /* Read U. Given 4:2:0 chroma sub-sampling, the size is 1/4 of Y
      because (height/2)*(width/2) = (height*width)/4. */
-  image->U = calloc(1, cm->padw[1]*cm->padh[1]);
+  image->U = calloc(1, cm->padw[U_COMPONENT]*cm->padh[U_COMPONENT]);
   len += fread(image->U, 1, (width*height)/4, file);
 
   /* Read V. Given 4:2:0 chroma sub-sampling, the size is 1/4 of Y. */
-  image->V = calloc(1, cm->padw[2]*cm->padh[2]);
+  image->V = calloc(1, cm->padw[V_COMPONENT]*cm->padh[V_COMPONENT]);
   len += fread(image->V, 1, (width*height)/4, file);
 
   if (ferror(file))
@@ -104,20 +104,25 @@ static void c63_encode_image(struct c63_common *cm, yuv_t *image)
   }
 
   /* DCT and Quantization */
-  dct_quantize(image->Y, cm->curframe->predicted->Y, cm->padw[0], cm->padh[0],
-      cm->curframe->residuals->Ydct, cm->quanttbl[0]);
-  dct_quantize(image->U, cm->curframe->predicted->U, cm->padw[1], cm->padh[1],
-      cm->curframe->residuals->Udct, cm->quanttbl[1]);
-  dct_quantize(image->V, cm->curframe->predicted->V, cm->padw[2], cm->padh[2],
-      cm->curframe->residuals->Vdct, cm->quanttbl[2]);
+  dct_quantize(image->Y, cm->curframe->predicted->Y, cm->padw[Y_COMPONENT],
+      cm->padh[Y_COMPONENT], cm->curframe->residuals->Ydct,
+      cm->quanttbl[Y_COMPONENT]);
+
+  dct_quantize(image->U, cm->curframe->predicted->U, cm->padw[U_COMPONENT],
+      cm->padh[U_COMPONENT], cm->curframe->residuals->Udct,
+      cm->quanttbl[U_COMPONENT]);
+
+  dct_quantize(image->V, cm->curframe->predicted->V, cm->padw[V_COMPONENT],
+      cm->padh[V_COMPONENT], cm->curframe->residuals->Vdct,
+      cm->quanttbl[V_COMPONENT]);
 
   /* Reconstruct frame for inter-prediction */
   dequantize_idct(cm->curframe->residuals->Ydct, cm->curframe->predicted->Y,
-      cm->ypw, cm->yph, cm->curframe->recons->Y, cm->quanttbl[0]);
+      cm->ypw, cm->yph, cm->curframe->recons->Y, cm->quanttbl[Y_COMPONENT]);
   dequantize_idct(cm->curframe->residuals->Udct, cm->curframe->predicted->U,
-      cm->upw, cm->uph, cm->curframe->recons->U, cm->quanttbl[1]);
+      cm->upw, cm->uph, cm->curframe->recons->U, cm->quanttbl[U_COMPONENT]);
   dequantize_idct(cm->curframe->residuals->Vdct, cm->curframe->predicted->V,
-      cm->vpw, cm->vph, cm->curframe->recons->V, cm->quanttbl[2]);
+      cm->vpw, cm->vph, cm->curframe->recons->V, cm->quanttbl[V_COMPONENT]);
 
   /* Function dump_image(), found in common.c, can be used here to check if the
      prediction is correct */
@@ -138,12 +143,12 @@ struct c63_common* init_c63_enc(int width, int height)
   cm->width = width;
   cm->height = height;
 
-  cm->padw[0] = cm->ypw = (uint32_t)(ceil(width/16.0f)*16);
-  cm->padh[0] = cm->yph = (uint32_t)(ceil(height/16.0f)*16);
-  cm->padw[1] = cm->upw = (uint32_t)(ceil(width*UX/(YX*8.0f))*8);
-  cm->padh[1] = cm->uph = (uint32_t)(ceil(height*UY/(YY*8.0f))*8);
-  cm->padw[2] = cm->vpw = (uint32_t)(ceil(width*VX/(YX*8.0f))*8);
-  cm->padh[2] = cm->vph = (uint32_t)(ceil(height*VY/(YY*8.0f))*8);
+  cm->padw[Y_COMPONENT] = cm->ypw = (uint32_t)(ceil(width/16.0f)*16);
+  cm->padh[Y_COMPONENT] = cm->yph = (uint32_t)(ceil(height/16.0f)*16);
+  cm->padw[U_COMPONENT] = cm->upw = (uint32_t)(ceil(width*UX/(YX*8.0f))*8);
+  cm->padh[U_COMPONENT] = cm->uph = (uint32_t)(ceil(height*UY/(YY*8.0f))*8);
+  cm->padw[V_COMPONENT] = cm->vpw = (uint32_t)(ceil(width*VX/(YX*8.0f))*8);
+  cm->padh[V_COMPONENT] = cm->vph = (uint32_t)(ceil(height*VY/(YY*8.0f))*8);
 
   cm->mb_cols = cm->ypw / 8;
   cm->mb_rows = cm->yph / 8;
@@ -156,9 +161,9 @@ struct c63_common* init_c63_enc(int width, int height)
   /* Initialize quantization tables */
   for (i = 0; i < 64; ++i)
   {
-    cm->quanttbl[0][i] = yquanttbl_def[i] / (cm->qp / 10.0);
-    cm->quanttbl[1][i] = uvquanttbl_def[i] / (cm->qp / 10.0);
-    cm->quanttbl[2][i] = uvquanttbl_def[i] / (cm->qp / 10.0);
+    cm->quanttbl[Y_COMPONENT][i] = yquanttbl_def[i] / (cm->qp / 10.0);
+    cm->quanttbl[U_COMPONENT][i] = uvquanttbl_def[i] / (cm->qp / 10.0);
+    cm->quanttbl[V_COMPONENT][i] = uvquanttbl_def[i] / (cm->qp / 10.0);
   }
 
   return cm;
