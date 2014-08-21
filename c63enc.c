@@ -153,7 +153,9 @@ struct c63_common* init_c63_enc(int width, int height)
   cm->mb_cols = cm->ypw / 8;
   cm->mb_rows = cm->yph / 8;
 
-  /* Quality parameters */
+  /* Quality parameters -- Home exam deliveries should have original values,
+   i.e., quantization factor should be 25, search range should be 16, and the
+   keyframe interval should be 100. */
   cm->qp = 25;                  // Constant quantization factor. Range: [1..50]
   cm->me_search_range = 16;     // Pixels in every direction
   cm->keyframe_interval = 100;  // Distance between keyframes
