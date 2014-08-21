@@ -13,22 +13,23 @@
 
 /* Motion estimation for 8x8 block */
 static void me_block_8x8(struct c63_common *cm, int mb_x, int mb_y,
-    uint8_t *orig, uint8_t *ref, int cc)
+    uint8_t *orig, uint8_t *ref, int color_component)
 {
-  struct macroblock *mb = &cm->curframe->mbs[cc][mb_y * cm->padw[cc]/8 + mb_x];
+  struct macroblock *mb =
+    &cm->curframe->mbs[color_component][mb_y*cm->padw[color_component]/8+mb_x];
 
   int range = cm->me_search_range;
 
-  /* Half resolution for chroma channels. */
-  if (cc > 0) { range /= 2; }
+  /* Quarter resolution for chroma channels. */
+  if (color_component > 0) { range /= 2; }
 
   int left = mb_x * 8 - range;
   int top = mb_y * 8 - range;
   int right = mb_x * 8 + range;
   int bottom = mb_y * 8 + range;
 
-  int w = cm->padw[cc];
-  int h = cm->padh[cc];
+  int w = cm->padw[color_component];
+  int h = cm->padh[color_component];
 
   /* Make sure we are within bounds of reference frame. TODO: Support partial
      frame bounds. */
@@ -92,18 +93,19 @@ void c63_motion_estimate(struct c63_common *cm)
     for (mb_x = 0; mb_x < cm->mb_cols / 2; ++mb_x)
     {
       me_block_8x8(cm, mb_x, mb_y, cm->curframe->orig->U,
-          cm->refframe->recons->U, 1);
+          cm->refframe->recons->U, U_COMPONENT);
       me_block_8x8(cm, mb_x, mb_y, cm->curframe->orig->V,
-          cm->refframe->recons->V, 2);
+          cm->refframe->recons->V, V_COMPONENT);
     }
   }
 }
 
 /* Motion compensation for 8x8 block */
 static void mc_block_8x8(struct c63_common *cm, int mb_x, int mb_y,
-    uint8_t *predicted, uint8_t *ref, int cc)
+    uint8_t *predicted, uint8_t *ref, int color_component)
 {
-  struct macroblock *mb = &cm->curframe->mbs[cc][mb_y * cm->padw[cc]/8 + mb_x];
+  struct macroblock *mb =
+    &cm->curframe->mbs[color_component][mb_y*cm->padw[color_component]/8+mb_x];
 
   if (!mb->use_mv) { return; }
 
@@ -112,7 +114,7 @@ static void mc_block_8x8(struct c63_common *cm, int mb_x, int mb_y,
   int right = left + 8;
   int bottom = top + 8;
 
-  int w = cm->padw[cc];
+  int w = cm->padw[color_component];
 
   /* Copy block from ref mandated by MV */
   int x, y;
